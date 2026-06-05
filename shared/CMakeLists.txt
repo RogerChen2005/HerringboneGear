@@ -3,6 +3,8 @@ find_package(nlohmann_json REQUIRED)
 add_library(gear_params
     gear_params.h
     gear_params.cpp
+    gear_geometry.h
+    gear_geometry.cpp
 )
 
 target_link_libraries(gear_params PRIVATE nlohmann_json::nlohmann_json)

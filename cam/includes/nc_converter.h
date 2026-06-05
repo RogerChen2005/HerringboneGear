@@ -1,23 +1,15 @@
 #pragma once
 
 #include "gear_params.h"
-#include <vector>
 #include <string>
-#include <utility>
+#include <vector>
 
-using Profile = std::vector<std::pair<double, double>>;
-
+// Pure NC format writer — no geometry, no toolpath logic.
 class NCConverter {
 public:
     explicit NCConverter(const GearParams& params);
 
-    void Generate(const std::string& filename);
-
-private:
-    GearParams params_;
-    std::vector<std::string> lines_;
-
-    // --- NC helpers (Heidenhain format) ---
+    // --- Low-level NC commands ---
     void AddLine(const std::string& line);
     void RapidLine(double x, double y, double z, double a, double c);
     void CutLine(double x, double y, double z, double a, double c);
@@ -28,16 +20,10 @@ private:
     void ProgramHeader();
     void ProgramFooter();
 
-    // --- Toolpath generation ---
-    void GenerateAllLayers();
-    void GenerateLayer(double z_pos, int layer_index, int total_layers);
-    void GenerateTooth(int tooth_idx, double z_pos,
-                       double twist_rad, double helix_deg, bool reverse);
+    // --- Output ---
+    void WriteToFile(const std::string& filename);
 
-    // --- Geometry helpers ---
-    double TwistAngle(double z) const;
-    double HelixAngleDeg(double z) const;
-    Profile ComputeProfile() const;
-    std::pair<double, double> RotatePoint(double x, double y, double angle_rad) const;
-    double RadToDeg(double rad) const;
+private:
+    GearParams params_;
+    std::vector<std::string> lines_;
 };

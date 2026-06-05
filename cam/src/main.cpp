@@ -1,4 +1,6 @@
 #include "nc_converter.h"
+#include "roughing.h"
+#include "finishing.h"
 #include <iostream>
 
 int main()
@@ -16,9 +18,22 @@ int main()
     std::cout << "  Helix angle: " << g.beta << " deg\n";
     std::cout << "  Face width:  " << 2 * g.F << " mm\n";
 
-    NCConverter converter(g);
-    converter.Generate("herringbone_gear.nc");
+    NCConverter rough(g);
+    NCConverter finish(g);
 
-    std::cout << "NC file written: herringbone_gear.nc\n";
+    rough.ProgramHeader();
+    GenerateRoughing(rough, g);
+    rough.ProgramFooter();
+
+    finish.ProgramHeader();
+    GenerateFinishing(finish, g);
+    finish.ProgramHeader();
+
+    rough.WriteToFile("rough.nc");
+    std::cout << "NC file written: rough.nc\n";
+
+    finish.WriteToFile("finish.nc");
+    std::cout << "NC file written: rough.nc\n";
+
     return 0;
 }

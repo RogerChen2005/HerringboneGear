@@ -1,4 +1,4 @@
-#include "profile.h"
+#include "gear_geometry.h"
 #include "sweep.h"
 #include "gear_params.h"
 
@@ -13,7 +13,7 @@
 
 void createHerringboneGear(const GearParams& g) {
     // 1. Compute 2D cross-section (all z teeth)
-    Profile profile = computeProfile(g);
+    Profile profile = gear::ComputeProfile(g);
 
     // 2. Helical sweep — front half (z: 0 → +F)
     auto half1 = sweepHalf(profile, g, +1.0);

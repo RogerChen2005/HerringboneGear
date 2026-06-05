@@ -11,7 +11,6 @@ find_package(VTK REQUIRED COMPONENTS
 add_executable(HerringboneGearCAD
     src/main.cpp
     src/herringBoneGear.cpp
-    src/profile.cpp
     src/stock.cpp
     src/sweep.cpp
 )

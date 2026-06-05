@@ -1,6 +1,6 @@
 #pragma once
 
-#include "profile.h"
+#include "gear_geometry.h"
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 
