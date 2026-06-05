@@ -12,10 +12,16 @@
 #include "gear_params.h"
 #include "herringbone_gear.h"
 #include "stock.h"
+#include <iostream>
 
 int main()
 {
     GearParams g;
+
+    if (loadFromJson(g, "gear.json"))
+        std::cout << "Loaded parameters from gear.json\n";
+    else
+        std::cout << "Using compiled defaults (no gear.json found)\n";
 
     createHerringboneGear(g);
     createStock(g);
