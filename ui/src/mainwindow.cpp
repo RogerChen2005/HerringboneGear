@@ -68,7 +68,7 @@ void MainWindow::setupUi()
     renderWindow_->AddRenderer(renderer_);
     vtkWidget_->setRenderWindow(renderWindow_);
 
-    renderer_->SetBackground(0.15, 0.15, 0.18);
+    renderer_->SetBackground(0.6, 0.6, 0.6);
     renderer_->AutomaticLightCreationOn();
 
     // ── Splitter layout ──────────────────────────────────────────────────────

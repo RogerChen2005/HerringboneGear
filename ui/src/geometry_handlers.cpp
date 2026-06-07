@@ -7,6 +7,9 @@
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkCamera.h>
+#include <vtkWindowedSincPolyDataFilter.h>
+#include <vtkOutlineFilter.h>
+#include <vtkPolyDataNormals.h>
 
 // ── Generate Geometry (CAD) ──────────────────────────────────────────────────
 void MainWindow::onGenerateGeometry()
@@ -32,15 +35,32 @@ void MainWindow::onGenerateGeometry()
     stockActor->GetProperty()->SetEdgeColor(1.0, 0.5, 0.0);
     renderer_->AddActor(stockActor);
 
+    // Gear outline actor (steel-grey, semi-transparent)
+    vtkNew<vtkOutlineFilter> outlineFilter;
+    outlineFilter->SetInputData(gearMesh);
+    vtkNew<vtkPolyDataMapper> outlineMapper;
+    outlineMapper->SetInputConnection(outlineFilter->GetOutputPort());
+    vtkNew<vtkActor> outlineActor;
+    outlineActor->SetMapper(outlineMapper);
+    renderer_->AddActor(outlineActor);
+
     // Gear actor (steel-grey, semi-transparent)
+    vtkNew<vtkPolyDataNormals> normalGen;
+    normalGen->SetInputData(gearMesh);
+    normalGen->SetFeatureAngle(30.0);   // split edges sharper than 30° → keeps tooth tips / chevron apex crisp
+    normalGen->SplittingOn();           // duplicate verts at feature edges
+    normalGen->ConsistencyOn();         // fix inconsistent winding
+    normalGen->AutoOrientNormalsOn();   // ensure outward orientation
+    normalGen->Update();
+
     vtkNew<vtkPolyDataMapper> gearMapper;
-    gearMapper->SetInputData(gearMesh);
+    gearMapper->SetInputConnection(normalGen->GetOutputPort());
     vtkNew<vtkActor> gearActor;
     gearActor->SetMapper(gearMapper);
     gearActor->GetProperty()->SetColor(0.75, 0.75, 0.80);
     // gearActor->GetProperty()->SetOpacity(0.95);
-    gearActor->GetProperty()->SetSpecular(0.4);
-    gearActor->GetProperty()->SetSpecularPower(30);
+    gearActor->GetProperty()->SetSpecular(0.9);
+    gearActor->GetProperty()->SetSpecularPower(10);
     renderer_->AddActor(gearActor);
 
     renderer_->ResetCamera();
