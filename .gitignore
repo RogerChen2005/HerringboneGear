@@ -1,2 +1,4 @@
 build/
 .claude
+.vs/
+CMakePresets.json

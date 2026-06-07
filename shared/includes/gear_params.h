@@ -14,6 +14,12 @@ struct GearParams {
     int    Kz    = 28;    // axial slices per half (more = smoother helix)
 };
 
+
+#ifndef M_PI
+   # define M_PI		3.14159265358979323846
+#endif
+
+
 // Load parameters from a JSON file.  Only keys present in the file are
 // overwritten; the rest keep their compiled-in defaults.
 //
