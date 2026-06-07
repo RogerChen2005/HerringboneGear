@@ -1,20 +1,10 @@
 #include "mainwindow.h"
-#include "gear_params.h"
-#include "herringbone_gear.h"
-#include "stock.h"
-#include "cam_generate.h"
 
 #include <QVBoxLayout>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QSplitter>
 #include <QApplication>
-
-#include <vtkNew.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkActor.h>
-#include <vtkProperty.h>
-#include <vtkCamera.h>
 
 #include <QVTKOpenGLNativeWidget.h>
 

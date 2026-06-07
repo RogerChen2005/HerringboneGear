@@ -1,4 +1,7 @@
 #include "mainwindow.h"
+#include "gear_params.h"
+#include "cam_generate.h"
+#include <QApplication>
 
 // ── Generate CAM Code ────────────────────────────────────────────────────────
 void MainWindow::onGenerateCAM()

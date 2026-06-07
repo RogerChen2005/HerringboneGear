@@ -3,6 +3,8 @@
 #include <vtkNew.h>
 #include <vtkTriangleFilter.h>
 #include <vtkCylinderSource.h>
+#include <vtkTransform.h>
+#include <vtkTransformFilter.h>
 #include <vtkSTLWriter.h>
 
 vtkSmartPointer<vtkPolyData> buildStockMesh(const GearParams& g)
@@ -12,13 +14,22 @@ vtkSmartPointer<vtkPolyData> buildStockMesh(const GearParams& g)
     vtkNew<vtkCylinderSource> cylinder;
     cylinder->SetRadius(ra);
     cylinder->SetHeight(2 * g.F);
-    cylinder->SetCenter(0.0, -g.F, 0.0);
+    cylinder->SetCenter(0.0, 0.0, 0.0);
     cylinder->SetResolution(64);
     cylinder->SetCapping(true);
     cylinder->Update();
 
+    // vtkCylinderSource creates along Y — rotate 90° around X to align with Z
+    vtkNew<vtkTransform> rotateToZ;
+    rotateToZ->RotateX(90.0);
+
+    vtkNew<vtkTransformFilter> transform;
+    transform->SetInputConnection(cylinder->GetOutputPort());
+    transform->SetTransform(rotateToZ);
+    transform->Update();
+
     vtkNew<vtkTriangleFilter> tri;
-    tri->SetInputConnection(cylinder->GetOutputPort());
+    tri->SetInputConnection(transform->GetOutputPort());
     tri->Update();
 
     return tri->GetOutput();

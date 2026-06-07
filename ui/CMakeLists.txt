@@ -14,8 +14,8 @@ aux_source_directory(src/ UI_SOURCES)
 
 add_executable(GearUI
     ${UI_SOURCES}
+    includes/mainwindow.h
 )
-
 target_include_directories(GearUI PRIVATE includes)
 
 target_link_libraries(GearUI PRIVATE
