@@ -2,6 +2,8 @@
 
 Parametric herringbone (double-helical) gear generator with CAM toolpath output and a Qt/VTK GUI for 3D preview.
 
+![](./assets/interface.png)
+
 ## Project Structure
 
 ```
