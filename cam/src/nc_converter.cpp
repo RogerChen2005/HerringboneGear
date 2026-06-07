@@ -121,3 +121,11 @@ void NCConverter::WriteToFile(const std::string& filename)
     for (const auto& line : lines_)
         out << line << "\n";
 }
+
+void NCConverter::ClearAll() {
+    this->lines_.clear();
+}
+
+void NCConverter::operator +=(const NCConverter& nc) {
+    lines_.insert(lines_.end(), nc.lines_.begin(), nc.lines_.end());
+}

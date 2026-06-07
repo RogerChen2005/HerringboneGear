@@ -1,6 +1,4 @@
-#include "nc_converter.h"
-#include "roughing.h"
-#include "finishing.h"
+#include "cam_generate.h"
 #include <iostream>
 
 int main()
@@ -18,22 +16,13 @@ int main()
     std::cout << "  Helix angle: " << g.beta << " deg\n";
     std::cout << "  Face width:  " << 2 * g.F << " mm\n";
 
-    NCConverter rough(g);
-    NCConverter finish(g);
-
-    rough.ProgramHeader();
-    GenerateRoughing(rough, g);
-    rough.ProgramFooter();
-
-    finish.ProgramHeader();
-    GenerateFinishing(finish, g);
-    finish.ProgramHeader();
-
+    auto rough = generateRoughing(g, 3, 2.0, 2.0, 0.5);
     rough.WriteToFile("rough.nc");
     std::cout << "NC file written: rough.nc\n";
 
+    auto finish = generateFinishing(g, g.z);
     finish.WriteToFile("finish.nc");
-    std::cout << "NC file written: rough.nc\n";
+    std::cout << "NC file written: finish.nc\n";
 
     return 0;
 }

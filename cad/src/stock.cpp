@@ -1,29 +1,36 @@
 #include "stock.h"
 
 #include <vtkNew.h>
-#include <vtkAppendPolyData.h>
+#include <vtkTriangleFilter.h>
 #include <vtkCylinderSource.h>
 #include <vtkSTLWriter.h>
-#include <vtkTriangleFilter.h>
 
-void createStock(GearParams g) {
-    auto cylinder = vtkCylinderSource::New();
-    double r  = g.m * g.z / 2.0;
-    double ra = r  + g.m;
+vtkSmartPointer<vtkPolyData> buildStockMesh(const GearParams& g)
+{
+    double ra = g.m * g.z / 2.0 + g.m;
+
+    vtkNew<vtkCylinderSource> cylinder;
     cylinder->SetRadius(ra);
-    cylinder->SetHeight(2*g.F);
+    cylinder->SetHeight(2 * g.F);
     cylinder->SetCenter(0.0, -g.F, 0.0);
-    cylinder->SetResolution(64);   // number of sides around circumference
-    cylinder->SetCapping(true);    // close top and bottom faces
+    cylinder->SetResolution(64);
+    cylinder->SetCapping(true);
     cylinder->Update();
 
-    vtkNew<vtkTriangleFilter> triangulate;
-    triangulate->SetInputConnection(cylinder->GetOutputPort());
-    triangulate->Update();
+    vtkNew<vtkTriangleFilter> tri;
+    tri->SetInputConnection(cylinder->GetOutputPort());
+    tri->Update();
+
+    return tri->GetOutput();
+}
+
+void createStock(GearParams g)
+{
+    auto mesh = buildStockMesh(g);
 
     vtkNew<vtkSTLWriter> writer;
     writer->SetFileName("gear_stock.stl");
-    writer->SetInputConnection(triangulate->GetOutputPort());
+    writer->SetInputData(mesh);
     writer->SetFileTypeToBinary();
     writer->Write();
 }
