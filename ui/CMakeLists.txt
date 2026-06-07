@@ -10,10 +10,10 @@ find_package(VTK REQUIRED COMPONENTS
 
 set(CMAKE_AUTOMOC ON)
 
+aux_source_directory(src/ UI_SOURCES)
+
 add_executable(GearUI
-    src/main.cpp
-    src/mainwindow.cpp
-    includes/mainwindow.h
+    ${UI_SOURCES}
 )
 
 target_include_directories(GearUI PRIVATE includes)
