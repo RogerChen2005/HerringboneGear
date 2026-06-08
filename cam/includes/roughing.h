@@ -4,10 +4,21 @@
 
 class RoughingCut {
 public:
+    RoughingCut(const GearParams& params);
     RoughingCut(const GearParams& params, double layer_depth, double cutter_diameter, double remain);
     ~RoughingCut();
 
     NCConverter& Generate(int teeth_count);
+
+    // Getters
+    double GetDepth() const { return depth_; }
+    double GetRemain() const { return remain_; }
+    double GetCutterDiameter() const { return d_cutter_; }
+
+    // Setters
+    void SetDepth(double depth) { depth_ = depth; }
+    void SetRemain(double remain) { remain_ = remain; }
+    void SetCutterDiameter(double d) { d_cutter_ = d; }
 
 private:
     NCConverter nc_;

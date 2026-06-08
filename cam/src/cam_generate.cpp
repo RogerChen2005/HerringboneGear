@@ -7,7 +7,10 @@ NCConverter generateRoughing(const GearParams& g, int teeth_count,
                              double remain)
 {
     NCConverter nc(g);
-    RoughingCut roughCut(g, layer_depth, cutter_diameter, remain);
+    RoughingCut roughCut(g);
+    roughCut.SetCutterDiameter(cutter_diameter);
+    roughCut.SetDepth(layer_depth);
+    roughCut.SetRemain(remain);
     nc.ProgramHeader();
     nc += roughCut.Generate(teeth_count);
     nc.ProgramFooter();

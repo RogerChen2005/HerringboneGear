@@ -31,7 +31,6 @@ endif()
 target_include_directories(GearUI PRIVATE includes)
 
 target_link_libraries(GearUI PRIVATE
-    Qt6::Widgets
     Gear::CAD_Core
     Gear::CAM_Core
     VTK::GUISupportQt

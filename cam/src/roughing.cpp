@@ -4,6 +4,9 @@
 #include <cmath>
 #include <string>
 
+RoughingCut::RoughingCut(const GearParams& params)
+    : params_(params), nc_(params), depth_(3), d_cutter_(2.0), remain_(2.0) {}
+
 RoughingCut::RoughingCut(const GearParams& params, double layer_depth, double cutter_diameter, double remain)
     : params_(params), nc_(params), depth_(layer_depth), d_cutter_(cutter_diameter), remain_(remain) {}
 

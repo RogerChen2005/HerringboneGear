@@ -12,6 +12,8 @@ struct GearParams {
     int    Ka    = 6;     // sample points per tip arc
     int    Kr    = 8;     // sample points per root fillet arc
     int    Kz    = 28;    // axial slices per half (more = smoother helix)
+    double x     = 0;     
+    double Rg    = 38;    // connect radius (mm); z < 42；
 };
 
 

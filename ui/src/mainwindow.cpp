@@ -37,6 +37,8 @@ void MainWindow::setupUi()
     spinKa_        = new QSpinBox;     spinKa_->setRange(2, 200);      spinKa_->setValue(6);
     spinKr_        = new QSpinBox;     spinKr_->setRange(2, 200);      spinKr_->setValue(8);
     spinKz_        = new QSpinBox;     spinKz_->setRange(2, 500);      spinKz_->setValue(28);
+    spinX_         = new QDoubleSpinBox; spinX_->setRange(0, 1);      spinX_->setValue(0);
+    spinRg_        = new QDoubleSpinBox; spinRg_->setRange(0, 50);      spinRg_->setValue(38);
 
     form->addRow("Teeth (z):",        spinTeeth_);
     form->addRow("Module (m):",       spinModule_);
@@ -47,6 +49,8 @@ void MainWindow::setupUi()
     form->addRow("Ka (tip arc):",     spinKa_);
     form->addRow("Kr (root fillet):", spinKr_);
     form->addRow("Kz (axial):",       spinKz_);
+    form->addRow("X (0-1):",          spinX_);
+    form->addRow("Connect Radius:",   spinRg_);
 
     btnGeometry_ = new QPushButton("Generate Geometry");
     btnCAM_      = new QPushButton("Generate CAM Code");
@@ -96,5 +100,7 @@ GearParams MainWindow::readParams() const
     g.Ka    = spinKa_->value();
     g.Kr    = spinKr_->value();
     g.Kz    = spinKz_->value();
+    g.x     = spinX_->value();
+    g.Rg    = spinRg_->value();
     return g;
 }

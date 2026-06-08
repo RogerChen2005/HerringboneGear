@@ -3,6 +3,18 @@
 
 namespace gear {
 
+double calc_theta(const double _rb, const double _rd, const double _rg) {
+    if (_rd > _rb) return 0.0;
+    double a = _rd + _rg, b = _rb, c = _rg;
+    return std::acos((a * a + b * b - c * c) / (2 * a * b));
+}
+
+double calc_radius(const double _theta, const double _rd, const double _rg) {
+    double a = _rd + _rg, c = _rg;
+    double ct = std::cos(_theta);
+    return a * ct - std::sqrt(a * a * ct * ct +  c * c - a * a); 
+}
+
 // ---------------------------------------------------------------------------
 // Involute profile — same math as CAD project (profile.cpp).
 // ---------------------------------------------------------------------------
@@ -13,8 +25,8 @@ Profile ComputeProfile(const GearParams& g)
 
     double r  = g.m * g.z / 2.0;
     double rb = r  * cos(g.alpha * deg);
-    double ra = r  + g.m;
-    double rd = r  - 1.25 * g.m;
+    double ra = r  + (1 + g.x) * g.m;
+    double rd = r  - (1.25 - g.x) * g.m;
 
     auto inv = [](double t) { return t - atan(t); };
 
@@ -28,6 +40,8 @@ Profile ComputeProfile(const GearParams& g)
 
     Profile pts;
     const double tooth_step = 2.0 * M_PI / g.z;
+
+    double theta = g.z < 42 ? calc_theta(rb, rd, g.Rg) : 0.0;
 
     for (int n = 0; n < g.z; ++n) {
         double base = n * tooth_step;
@@ -56,13 +70,29 @@ Profile ComputeProfile(const GearParams& g)
             pts.push_back({ rad * cos(angle), rad * sin(angle) });
         }
 
-        // Root fillet arc
         double ang_root_end  = base + phi0;
         double ang_root_next = base + tooth_step - phi0;
+
+        if (g.z < 42)
+            for (int i = 1; i <= g.Kr; ++i) {
+                double rad = calc_radius(theta * (1.0 - (double)i / g.Kr), rd , g.Rg);
+                double a = ang_root_end + theta * i / g.Kr;
+                pts.push_back({ rad * cos(a), rad * sin(a) });
+            }
+        
+        // Root fillet arc
         for (int i = 1; i <= g.Kr; ++i) {
-            double a = ang_root_end + (ang_root_next - ang_root_end) * i / g.Kr;
+            double end = ang_root_end + theta, next = ang_root_next - theta;
+            double a = end + (next - end) * i / g.Kr;
             pts.push_back({ rd * cos(a), rd * sin(a) });
         }
+
+        if (g.z < 42)
+            for (int i = 1; i <= g.Kr; ++i) {
+                double rad = calc_radius(theta * i / g.Kr, rd , g.Rg);
+                double a = ang_root_next - theta * (1.0 - (double)i / g.Kr);
+                pts.push_back({ rad * cos(a), rad * sin(a) });
+            }
     }
     return pts;
 }

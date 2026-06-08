@@ -35,6 +35,8 @@ private:
     QSpinBox*     spinKa_;
     QSpinBox*     spinKr_;
     QSpinBox*     spinKz_;
+    QDoubleSpinBox*     spinRg_;
+    QDoubleSpinBox*     spinX_;
 
     QPushButton* btnGeometry_;
     QPushButton* btnCAM_;
