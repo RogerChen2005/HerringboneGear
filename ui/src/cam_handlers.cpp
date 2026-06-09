@@ -2,20 +2,38 @@
 #include "gear_params.h"
 #include "cam_generate.h"
 #include <QApplication>
+#include <QFileDialog>
 
 // ── Generate CAM Code ────────────────────────────────────────────────────────
 void MainWindow::onGenerateCAM()
 {
-    statusLabel_->setText("Generating CAM toolpaths...");
+    GearParams g = readParams();
+    auto rp = readRoughParams();
+    auto fp = readFinishParams();
+
+    // ── Roughing ────────────────────────────────────────────────────────────
+    statusLabel_->setText("Generating roughing toolpath...");
     QApplication::processEvents();
 
-    GearParams g = readParams();
+    auto rough = generateRoughing(g, rp.teeth_count, rp.layer_depth, rp.cutter_diameter, rp.remain);
 
-    auto rough  = generateRoughing(g, 3, 2.0, 2.0, 0.5);
-    rough.WriteToFile("rough.nc");
+    QString roughPath = QFileDialog::getSaveFileName(
+        this, "Save Roughing NC", "rough.nc", "NC Files (*.nc)");
+    if (!roughPath.isEmpty()) {
+        rough.WriteToFile(roughPath.toUtf8().constData());
+    }
 
-    auto finish = generateFinishing(g, g.z, 0.2, 4.0, 0.5);
-    finish.WriteToFile("finish.nc");
+    // ── Finishing ───────────────────────────────────────────────────────────
+    statusLabel_->setText("Generating finishing toolpath...");
+    QApplication::processEvents();
 
-    statusLabel_->setText("CAM done — wrote rough.nc, finish.nc");
+    auto finish = generateFinishing(g, fp.teeth_count, fp.layer_depth, fp.cutter_diameter, fp.remain, fp.h_cutter, fp.Ra);
+
+    QString finishPath = QFileDialog::getSaveFileName(
+        this, "Save Finishing NC", "finish.nc", "NC Files (*.nc)");
+    if (!finishPath.isEmpty()) {
+        finish.WriteToFile(finishPath.toUtf8().constData());
+    }
+
+    statusLabel_->setText("CAM done.");
 }

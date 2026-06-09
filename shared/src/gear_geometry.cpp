@@ -1,4 +1,5 @@
 #include "gear_geometry.h"
+#include "gear_derived.h"
 #include <cmath>
 
 namespace gear {
@@ -21,27 +22,22 @@ double calc_radius(const double _theta, const double _rd, const double _rg) {
 
 Profile ComputeProfile(const GearParams& g)
 {
-    const double deg = M_PI / 180.0;
-
-    double r  = g.m * g.z / 2.0;
-    double rb = r  * cos(g.alpha * deg);
-    double ra = r  + (1 + g.x) * g.m;
-    double rd = r  - (1.25 - g.x) * g.m;
+    GearDerived d(g);
 
     auto inv = [](double t) { return t - atan(t); };
 
-    double inv_pc     = tan(g.alpha * deg) - g.alpha * deg;
-    double theta_half = M_PI / (2.0 * g.z);
-    double phi0       = theta_half + inv_pc;
+    // inv_pc uses tan(alpha)-alpha form (equivalent to inv(tan(alpha)))
+    double inv_pc     = tan(g.alpha * M_PI / 180.0) - g.alpha * M_PI / 180.0;
+    double phi0       = d.theta_half + inv_pc;
 
-    double t_tip  = sqrt((ra / rb) * (ra / rb) - 1.0);
-    double t_root = (rd > rb) ? sqrt((rd / rb) * (rd / rb) - 1.0) : 0.0;
+    double t_tip  = sqrt((d.ra / d.rb) * (d.ra / d.rb) - 1.0);
+    double t_root = (d.rd > d.rb) ? sqrt((d.rd / d.rb) * (d.rd / d.rb) - 1.0) : 0.0;
     double inv_tip = inv(t_tip);
 
     Profile pts;
     const double tooth_step = 2.0 * M_PI / g.z;
 
-    double theta = g.z < 42 ? calc_theta(rb, rd, g.Rg) : 0.0;
+    double theta = g.z < 42 ? calc_theta(d.rb, d.rd, g.Rg) : 0.0;
 
     for (int n = 0; n < g.z; ++n) {
         double base = n * tooth_step;
@@ -50,7 +46,7 @@ Profile ComputeProfile(const GearParams& g)
         for (int i = 0; i <= g.Kt; ++i) {
             double t     = t_root + (t_tip - t_root) * i / g.Kt;
             double angle = base - phi0 + inv(t);
-            double rad   = rb * sqrt(1.0 + t * t);
+            double rad   = d.rb * sqrt(1.0 + t * t);
             pts.push_back({ rad * cos(angle), rad * sin(angle) });
         }
 
@@ -59,14 +55,14 @@ Profile ComputeProfile(const GearParams& g)
         double ang_R = base + phi0 - inv_tip;
         for (int i = 1; i <= g.Ka; ++i) {
             double a = ang_L + (ang_R - ang_L) * i / g.Ka;
-            pts.push_back({ ra * cos(a), ra * sin(a) });
+            pts.push_back({ d.ra * cos(a), d.ra * sin(a) });
         }
 
         // Right flank
         for (int i = g.Kt; i >= 0; --i) {
             double t     = t_root + (t_tip - t_root) * i / g.Kt;
             double angle = base + phi0 - inv(t);
-            double rad   = rb * sqrt(1.0 + t * t);
+            double rad   = d.rb * sqrt(1.0 + t * t);
             pts.push_back({ rad * cos(angle), rad * sin(angle) });
         }
 
@@ -75,7 +71,7 @@ Profile ComputeProfile(const GearParams& g)
 
         if (g.z < 42)
             for (int i = 1; i <= g.Kr; ++i) {
-                double rad = calc_radius(theta * (1.0 - (double)i / g.Kr), rd , g.Rg);
+                double rad = calc_radius(theta * (1.0 - (double)i / g.Kr), d.rd , g.Rg);
                 double a = ang_root_end + theta * i / g.Kr;
                 pts.push_back({ rad * cos(a), rad * sin(a) });
             }
@@ -84,12 +80,12 @@ Profile ComputeProfile(const GearParams& g)
         for (int i = 1; i <= g.Kr; ++i) {
             double end = ang_root_end + theta, next = ang_root_next - theta;
             double a = end + (next - end) * i / g.Kr;
-            pts.push_back({ rd * cos(a), rd * sin(a) });
+            pts.push_back({ d.rd * cos(a), d.rd * sin(a) });
         }
 
         if (g.z < 42)
             for (int i = 1; i <= g.Kr; ++i) {
-                double rad = calc_radius(theta * i / g.Kr, rd , g.Rg);
+                double rad = calc_radius(theta * i / g.Kr, d.rd , g.Rg);
                 double a = ang_root_next - theta * (1.0 - (double)i / g.Kr);
                 pts.push_back({ rad * cos(a), rad * sin(a) });
             }

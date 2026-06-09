@@ -10,6 +10,7 @@ find_package(VTK REQUIRED COMPONENTS
     InteractionStyle
     RenderingCore
     RenderingFreeType
+    IOGeometry
 )
 
 set(CMAKE_AUTOMOC ON)
@@ -38,6 +39,7 @@ target_link_libraries(GearUI PRIVATE
     VTK::InteractionStyle
     VTK::RenderingCore
     VTK::RenderingFreeType
+    VTK::IOGeometry
 )
 
 if(WIN32)

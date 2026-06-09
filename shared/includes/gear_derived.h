@@ -1,0 +1,26 @@
+#pragma once
+
+#include "gear_params.h"
+#include <cmath>
+
+struct GearDerived {
+    double r;           // pitch radius
+    double rb;          // base circle radius
+    double ra;          // addendum (tip) radius
+    double rd;          // dedendum (root) radius
+    double inv_pc;      // involute function at pressure angle
+    double theta_half;  // half tooth angular span = PI / (2*z)
+    double phi0;        // initial angular offset = theta_half + inv_pc
+
+    explicit GearDerived(const GearParams& g)
+        : r(g.m * g.z / 2.0)
+        , rb(r * std::cos(g.alpha * M_PI / 180.0))
+        , ra(r + (1 + g.x) * g.m)
+        , rd(r - (1.25 - g.x) * g.m)
+        , inv_pc(inv(g.alpha * M_PI / 180.0))
+        , theta_half(M_PI / (2.0 * g.z))
+        , phi0(theta_half + inv_pc)
+    {}
+
+    static double inv(double t) { return t - std::atan(t); }
+};

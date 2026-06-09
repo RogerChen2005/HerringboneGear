@@ -1,6 +1,7 @@
 #pragma once
 
 #include "nc_converter.h"
+#include "gear_derived.h"
 #include "point.h"
 
 class RoughingCut {
@@ -23,6 +24,7 @@ public:
 private:
     NCConverter nc_;
     GearParams params_;
+    GearDerived derived_;
     double depth_;
     double d_cutter_;
     double remain_;

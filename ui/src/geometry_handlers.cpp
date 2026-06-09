@@ -2,7 +2,9 @@
 #include "herringbone_gear.h"
 #include "stock.h"
 #include <QApplication>
+#include <QFileDialog>
 #include <vtkNew.h>
+#include <vtkSTLWriter.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkProperty.h>
@@ -19,14 +21,14 @@ void MainWindow::onGenerateGeometry()
 
     GearParams g = readParams();
 
-    auto gearMesh  = buildGearMesh(g);
-    auto stockMesh = buildStockMesh(g);
+    gearMesh_  = buildGearMesh(g);
+    stockMesh_ = buildStockMesh(g);
 
     renderer_->RemoveAllViewProps();
 
     // Stock actor (orange wireframe overlay)
     vtkNew<vtkPolyDataMapper> stockMapper;
-    stockMapper->SetInputData(stockMesh);
+    stockMapper->SetInputData(stockMesh_);
     vtkNew<vtkActor> stockActor;
     stockActor->SetMapper(stockMapper);
     stockActor->GetProperty()->SetColor(1.0, 0.6, 0.2);
@@ -37,7 +39,7 @@ void MainWindow::onGenerateGeometry()
 
     // Gear outline actor (steel-grey, semi-transparent)
     vtkNew<vtkOutlineFilter> outlineFilter;
-    outlineFilter->SetInputData(gearMesh);
+    outlineFilter->SetInputData(gearMesh_);
     vtkNew<vtkPolyDataMapper> outlineMapper;
     outlineMapper->SetInputConnection(outlineFilter->GetOutputPort());
     vtkNew<vtkActor> outlineActor;
@@ -46,7 +48,7 @@ void MainWindow::onGenerateGeometry()
 
     // Gear actor (steel-grey, semi-transparent)
     vtkNew<vtkPolyDataNormals> normalGen;
-    normalGen->SetInputData(gearMesh);
+    normalGen->SetInputData(gearMesh_);
     normalGen->SetFeatureAngle(30.0);   // split edges sharper than 30° → keeps tooth tips / chevron apex crisp
     normalGen->SplittingOn();           // duplicate verts at feature edges
     normalGen->ConsistencyOn();         // fix inconsistent winding
@@ -66,5 +68,37 @@ void MainWindow::onGenerateGeometry()
     renderer_->ResetCamera();
     renderWindow_->Render();
 
+    btnSaveGeometry_->setEnabled(true);
     statusLabel_->setText("Geometry generated.");
+}
+
+// ── Save Geometry (STL) ─────────────────────────────────────────────────────
+void MainWindow::onSaveGeometry()
+{
+    if (!gearMesh_ && !stockMesh_) return;
+
+    QString path = QFileDialog::getSaveFileName(
+        this, "Save STL", "gear.stl", "STL Files (*.stl)");
+    if (path.isEmpty()) return;
+
+    statusLabel_->setText("Saving STL...");
+    QApplication::processEvents();
+
+    if (gearMesh_) {
+        vtkNew<vtkSTLWriter> writer;
+        writer->SetFileName(path.toUtf8().constData());
+        writer->SetInputData(gearMesh_);
+        writer->Write();
+    }
+
+    if (stockMesh_) {
+        QString stockPath = path;
+        stockPath.replace(".stl", "_stock.stl");
+        vtkNew<vtkSTLWriter> writer;
+        writer->SetFileName(stockPath.toUtf8().constData());
+        writer->SetInputData(stockMesh_);
+        writer->Write();
+    }
+
+    statusLabel_->setText("STL saved: " + path);
 }

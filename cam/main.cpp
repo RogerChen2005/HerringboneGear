@@ -20,7 +20,7 @@ int main()
     rough.WriteToFile("rough.nc");
     std::cout << "NC file written: rough.nc\n";
 
-    auto finish = generateFinishing(g, 1, 0.2, 4.0, 0.5);
+    auto finish = generateFinishing(g, 1, 0.2, 4.0, 0.5, 25.0, 0.064);
     finish.WriteToFile("finish.nc");
     std::cout << "NC file written: finish.nc\n";
 

@@ -1,34 +1,23 @@
 #include "roughing.h"
 #include "gear_geometry.h"
+#include "gear_derived.h"
 #include <iostream>
 #include <cmath>
 #include <string>
 
 RoughingCut::RoughingCut(const GearParams& params)
-    : params_(params), nc_(params), depth_(3), d_cutter_(6.0), remain_(0.5), 
+    : params_(params), nc_(params), derived_(params), depth_(3), d_cutter_(6.0), remain_(0.5),
     reverse_(false), twist_(gear::TwistAngle(params, params.F)) {}
 
 RoughingCut::~RoughingCut() = default;
 
 void RoughingCut::RoughTooth(const double base) {
-    const double deg = M_PI / 180.0;
-    double r  = params_.m * params_.z / 2.0;
-    double rb = r  * cos(params_.alpha * deg);
-    double ra = r  + params_.m;
-    double rd = r  - 1.25 * params_.m;
-    
-    auto inv = [](double t) { return t - atan(t); };
-
-    double inv_pc     = inv(params_.alpha * deg);
-    double theta_half = M_PI / (2.0 * params_.z);
-    double phi0       = theta_half + inv_pc;
-
-    for (double rc = ra ; rc >= rd; rc -= this->depth_) {
-        double phi  = (rc > rb) ? inv(sqrt((rc / rb) * (rc / rb) - 1.0)) :
-                 gear::calc_theta(rc, rd, params_.Rg) - gear::calc_theta(rb, rd, params_.Rg);
+    for (double rc = derived_.ra ; rc >= derived_.rd; rc -= this->depth_) {
+        double phi  = (rc > derived_.rb) ? GearDerived::inv(sqrt((rc / derived_.rb) * (rc / derived_.rb) - 1.0)) :
+                 gear::calc_theta(rc, derived_.rd, params_.Rg) - gear::calc_theta(derived_.rb, derived_.rd, params_.Rg);
         double remain_phi = (remain_ + d_cutter_ / 2) / rc;
-        double start = base + phi0 - phi + remain_phi;
-        double end = base + theta_half * 4 - phi0 + phi - remain_phi;
+        double start = base + derived_.phi0 - phi + remain_phi;
+        double end = base + derived_.theta_half * 4 - derived_.phi0 + phi - remain_phi;
         RoughLayer(rc, start, end);
     }
 
