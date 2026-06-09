@@ -1,11 +1,11 @@
 #pragma once
 
 #include "nc_converter.h"
+#include "point.h"
 
 class RoughingCut {
 public:
     RoughingCut(const GearParams& params);
-    RoughingCut(const GearParams& params, double layer_depth, double cutter_diameter, double remain);
     ~RoughingCut();
 
     NCConverter& Generate(int teeth_count);
@@ -26,7 +26,10 @@ private:
     double depth_;
     double d_cutter_;
     double remain_;
+    double reverse_;
+    double twist_;
 
+    void CutAcross(const Point& p);
     void RoughTooth(const double base);
     void RoughLayer(const double radius, const double start, const double end);
 };

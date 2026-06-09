@@ -10,4 +10,6 @@ NCConverter generateRoughing(const GearParams& g, int teeth_count,
 
 // Generate a finishing pass for all teeth.
 // Returns the NCConverter with the toolpath (no header/footer).
-NCConverter generateFinishing(const GearParams& g, int teeth_count);
+NCConverter generateFinishing(const GearParams& g, int teeth_count,
+                             double layer_depth, double cutter_diameter,
+                             double remain);

@@ -13,7 +13,7 @@ struct GearParams {
     int    Kr    = 8;     // sample points per root fillet arc
     int    Kz    = 28;    // axial slices per half (more = smoother helix)
     double x     = 0;     
-    double Rg    = 38;    // connect radius (mm); z < 42；
+    double Rg    = 10;    // connect radius (mm); z < 42；
 };
 
 

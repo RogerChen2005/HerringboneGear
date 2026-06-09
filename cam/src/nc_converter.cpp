@@ -55,6 +55,18 @@ void NCConverter::RapidLine(double x, double y, double z, double a, double c)
     lines_.push_back(os.str());
 }
 
+void NCConverter::RapidLine(const Point p, double z)
+{
+    std::ostringstream os;
+    os << "L X" << Fmt(p.y, 3)
+       << " Y" << Fmt(p.x, 3)
+       << " Z" << Fmt(z, 3)
+       << " A" << Fmt(-90, 4)
+       << " C" << Fmt(-p.angle(), 4)
+       << " FMAX";
+    lines_.push_back(os.str());
+}
+
 void NCConverter::CutLine(double x, double y, double z, double a, double c)
 {
     std::ostringstream os;
@@ -67,11 +79,15 @@ void NCConverter::CutLine(double x, double y, double z, double a, double c)
     lines_.push_back(os.str());
 }
 
+void NCConverter::ChangeTool(int number) {
+    AddLine("TOOL CALL" + std::to_string(number) + "Z S3000");
+}
+
 // ---------------------------------------------------------------------------
 // Program structure
 // ---------------------------------------------------------------------------
 
-void NCConverter::ProgramHeader()
+void NCConverter::ProgramHeader(int tool)
 {
     AddLine("BEGIN PGM 100 MM");
 
@@ -85,7 +101,7 @@ void NCConverter::ProgramHeader()
 
     BlankLine();
     AddLine("M129");
-    AddLine("TOOL CALL 1 Z S3000");
+    ChangeTool(tool);
     AddLine("M3");
     AddLine("M11 M16 M140 MB MAX F5000");
     BlankLine();

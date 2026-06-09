@@ -5,10 +5,8 @@
 #include <string>
 
 RoughingCut::RoughingCut(const GearParams& params)
-    : params_(params), nc_(params), depth_(3), d_cutter_(2.0), remain_(2.0) {}
-
-RoughingCut::RoughingCut(const GearParams& params, double layer_depth, double cutter_diameter, double remain)
-    : params_(params), nc_(params), depth_(layer_depth), d_cutter_(cutter_diameter), remain_(remain) {}
+    : params_(params), nc_(params), depth_(3), d_cutter_(6.0), remain_(0.5), 
+    reverse_(false), twist_(gear::TwistAngle(params, params.F)) {}
 
 RoughingCut::~RoughingCut() = default;
 
@@ -26,10 +24,11 @@ void RoughingCut::RoughTooth(const double base) {
     double phi0       = theta_half + inv_pc;
 
     for (double rc = ra ; rc >= rd; rc -= this->depth_) {
-        double t  = (rc > rb) ? sqrt((rc / rb) * (rc / rb) - 1.0) : 0.0;
-        double remain_phi = remain_ / rc;
-        double start = base + phi0 - inv(t) + remain_phi;
-        double end = base + M_PI / params_.z * 2 - phi0 + inv(t) - remain_phi;
+        double phi  = (rc > rb) ? inv(sqrt((rc / rb) * (rc / rb) - 1.0)) :
+                 gear::calc_theta(rc, rd, params_.Rg) - gear::calc_theta(rb, rd, params_.Rg);
+        double remain_phi = (remain_ + d_cutter_ / 2) / rc;
+        double start = base + phi0 - phi + remain_phi;
+        double end = base + theta_half * 4 - phi0 + phi - remain_phi;
         RoughLayer(rc, start, end);
     }
 
@@ -37,26 +36,22 @@ void RoughingCut::RoughTooth(const double base) {
 }
 
 void RoughingCut::RoughLayer(const double radius, const double start, const double end) {
-    const double twist = gear::TwistAngle(params_, params_.F);
     nc_.RapidLine(radius * std::sin(start), radius * std::cos(start), (params_.F + d_cutter_) * 2, -90, start);
     double d_phi = d_cutter_ / radius;
     const int t = static_cast<int>((end - start) / d_phi);
-    bool reverse = false;
-    double phi1 = 0, phi2 = 0;
-    for (int i = 0;i < t;i++) {
-        phi1 = start + d_phi * i;
-        phi2 = phi1 + twist;
-        nc_.CutLine(radius * std::sin(phi1), radius * std::cos(phi1), params_.F * (reverse ? 0 : 2), -90, -gear::RadToDeg(phi1));
-        nc_.CutLine(radius * std::sin(phi2), radius * std::cos(phi2), params_.F, -90, -gear::RadToDeg(phi2));
-        nc_.CutLine(radius * std::sin(phi1), radius * std::cos(phi1), params_.F * (reverse ? 2 : 0), -90, -gear::RadToDeg(phi1));
-        reverse = !reverse;
-    }
-    if(reverse) {  
-        nc_.RapidLine(radius * std::sin(phi1), radius * std::cos(phi1), params_.F * 0, -90, -gear::RadToDeg(phi1));
-        nc_.RapidLine(radius * std::sin(phi2), radius * std::cos(phi2), params_.F, -90, -gear::RadToDeg(phi2));
-        nc_.RapidLine(radius * std::sin(phi1), radius * std::cos(phi1), params_.F * 2, -90, -gear::RadToDeg(phi1)); 
-    }
+    Point p = Point::fromPolar(radius, start);
+    for (int i = 0;i <= t;i++) CutAcross(p.rotated(i * d_phi));
+    CutAcross(p.rotated(end - start));
+    if(reverse_) CutAcross(p.rotated(end - start));
     nc_.RapidLine(radius * std::sin(end), radius * std::cos(end), (params_.F + d_cutter_) * 2, -90, end);
+}
+
+void RoughingCut::CutAcross(const Point& p) {
+    Point mid = p.rotated(twist_);
+    nc_.CutLine(p.y, p.x, params_.F * (reverse_ ? 0 : 2), -90, -gear::RadToDeg(p.angle()));
+    nc_.CutLine(mid.y, mid.x, params_.F, -90, -gear::RadToDeg(mid.angle()));
+    nc_.CutLine(p.y, p.x, params_.F * (reverse_ ? 2 : 0), -90, -gear::RadToDeg(p.angle()));
+    this->reverse_ = !this->reverse_;
 }
 
 // ---------------------------------------------------------------------------

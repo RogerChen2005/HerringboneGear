@@ -16,11 +16,11 @@ int main()
     std::cout << "  Helix angle: " << g.beta << " deg\n";
     std::cout << "  Face width:  " << 2 * g.F << " mm\n";
 
-    auto rough = generateRoughing(g, 3, 2.0, 2.0, 0.5);
+    auto rough = generateRoughing(g, 1, 2.0, 6.0, 0.5);
     rough.WriteToFile("rough.nc");
     std::cout << "NC file written: rough.nc\n";
 
-    auto finish = generateFinishing(g, g.z);
+    auto finish = generateFinishing(g, 1, 0.2, 4.0, 0.5);
     finish.WriteToFile("finish.nc");
     std::cout << "NC file written: finish.nc\n";
 

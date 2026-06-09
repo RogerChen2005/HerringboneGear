@@ -14,7 +14,7 @@ void MainWindow::onGenerateCAM()
     auto rough  = generateRoughing(g, 3, 2.0, 2.0, 0.5);
     rough.WriteToFile("rough.nc");
 
-    auto finish = generateFinishing(g, g.z);
+    auto finish = generateFinishing(g, g.z, 0.2, 4.0, 0.5);
     finish.WriteToFile("finish.nc");
 
     statusLabel_->setText("CAM done — wrote rough.nc, finish.nc");

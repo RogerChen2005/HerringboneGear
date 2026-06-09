@@ -9,7 +9,7 @@
 
 vtkSmartPointer<vtkPolyData> buildStockMesh(const GearParams& g)
 {
-    double ra = g.m * g.z / 2.0 + g.m;
+    double ra = g.m * g.z / 2.0 + (1 + g.x) * g.m;
 
     vtkNew<vtkCylinderSource> cylinder;
     cylinder->SetRadius(ra);
