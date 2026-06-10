@@ -8,6 +8,7 @@ struct RoughParams {
     double cutter_diameter = 6.0;  // mm
     double remain          = 0.5;  // stock left for finishing (mm)
     int    teeth_count     = 1;    // number of teeth to cut
+    int    tool_number     = 1;    // NC tool number (TOOL CALL)
 };
 
 class RoughingCut : public ToolpathPass {

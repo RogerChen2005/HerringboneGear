@@ -47,6 +47,7 @@ private:
     // Roughing parameter spinboxes
     QDoubleSpinBox* spinRoughDepth_;
     QDoubleSpinBox* spinRoughCutter_;
+    QSpinBox*       spinRoughTool_;
     QSpinBox*       spinCutTeeth_;
 
     // Finishing parameter spinboxes
@@ -54,6 +55,7 @@ private:
     QDoubleSpinBox* spinFinishCutter_;
     QDoubleSpinBox* spinFinishH_;
     QDoubleSpinBox* spinFinishRa_;
+    QSpinBox*       spinFinishTool_;
 
     QPushButton* btnGeometry_;
     QPushButton* btnSaveGeometry_;

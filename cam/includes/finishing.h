@@ -10,6 +10,7 @@ struct FinishParams {
     int    teeth_count     = 1;     // number of teeth to cut
     double h_cutter        = 25.0;  // cutter height (mm)
     double Ra              = 0.064; // target surface roughness (mm)
+    int    tool_number     = 60;    // NC tool number (TOOL CALL)
 };
 
 class FinishingCut : public ToolpathPass {

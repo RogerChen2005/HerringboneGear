@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget* parent)
 {
     setupUi();
     setWindowTitle("Herringbone Gear — CAD / CAM");
-    resize(1200, 800);
+    resize(1300, 600);
 }
 
 // ── UI construction ─────────────────────────────────────────────────────────
@@ -25,10 +25,18 @@ void MainWindow::setupUi()
     auto* central = new QWidget(this);
     auto* hbox    = new QHBoxLayout(central);
 
+    // Taller input fields / buttons with more breathing room.
+    central->setStyleSheet(
+        "QSpinBox, QDoubleSpinBox { min-height: 22px; padding: 2px 4px; }"
+        "QPushButton { min-height: 22px; padding: 4px 8px; }");
+
     // ── Left panel: parameters ───────────────────────────────────────────────
 
     auto* paramBox  = new QGroupBox("齿轮参数");
     auto* form      = new QFormLayout(paramBox);
+    form->setVerticalSpacing(8);
+    form->setHorizontalSpacing(8);
+    form->setContentsMargins(8, 12, 8, 8);
 
     const GearParams gd;   // single source of truth for default values
 
@@ -76,11 +84,16 @@ void MainWindow::setupUi()
 
     auto* roughBox  = new QGroupBox("粗加工参数");
     auto* roughForm = new QFormLayout(roughBox);
+    roughForm->setVerticalSpacing(8);
+    roughForm->setHorizontalSpacing(8);
+    roughForm->setContentsMargins(8, 12, 8, 8);
 
     spinRoughDepth_  = new QDoubleSpinBox; spinRoughDepth_->setRange(0.01, 50.0);  spinRoughDepth_->setValue(rd.layer_depth);  spinRoughDepth_->setSuffix(" mm");
     spinRoughCutter_ = new QDoubleSpinBox; spinRoughCutter_->setRange(0.5, 50.0);  spinRoughCutter_->setValue(rd.cutter_diameter); spinRoughCutter_->setSuffix(" mm");
+    spinRoughTool_   = new QSpinBox;       spinRoughTool_->setRange(1, 999);       spinRoughTool_->setValue(rd.tool_number);
     spinCutTeeth_  = new QSpinBox;       spinCutTeeth_->setRange(1, 200);      spinCutTeeth_->setValue(rd.teeth_count);
 
+    roughForm->addRow("刀具序号:",     spinRoughTool_);
     roughForm->addRow("切削深度:",     spinRoughDepth_);
     roughForm->addRow("刀具直径:", spinRoughCutter_);
     roughForm->addRow("粗加工余量:",    spinCamRemain_);
@@ -89,11 +102,15 @@ void MainWindow::setupUi()
 
     auto* finishBox  = new QGroupBox("精加工参数");
     auto* finishForm = new QFormLayout(finishBox);
+    finishForm->setVerticalSpacing(8);
+    finishForm->setHorizontalSpacing(8);
+    finishForm->setContentsMargins(8, 12, 8, 8);
 
     spinFinishDepth_  = new QDoubleSpinBox; spinFinishDepth_->setRange(0.01, 50.0);  spinFinishDepth_->setValue(fd.layer_depth);  spinFinishDepth_->setSuffix(" mm");
     spinFinishCutter_ = new QDoubleSpinBox; spinFinishCutter_->setRange(0.5, 50.0);  spinFinishCutter_->setValue(fd.cutter_diameter); spinFinishCutter_->setSuffix(" mm");
     spinFinishH_      = new QDoubleSpinBox; spinFinishH_->setRange(0.1, 100.0);     spinFinishH_->setValue(fd.h_cutter);    spinFinishH_->setSuffix(" mm");
     spinFinishRa_     = new QDoubleSpinBox; spinFinishRa_->setRange(0.001, 1.0);    spinFinishRa_->setSuffix(" mm");
+    spinFinishTool_   = new QSpinBox;       spinFinishTool_->setRange(1, 999);      spinFinishTool_->setValue(fd.tool_number);
 
     // Qt defaults: step 1.0 is too coarse for double parameters; Ra needs
     // 3 decimals (default 0.064) and a finer step.
@@ -106,6 +123,7 @@ void MainWindow::setupUi()
     spinFinishRa_->setSingleStep(0.01);
     spinFinishRa_->setValue(fd.Ra);
 
+    finishForm->addRow("刀具序号:",     spinFinishTool_);
     finishForm->addRow("切削深度:",     spinFinishDepth_);
     finishForm->addRow("刀具直径:", spinFinishCutter_);
     finishForm->addRow("刀具高度:",   spinFinishH_);
@@ -130,21 +148,39 @@ void MainWindow::setupUi()
 
     // ── Splitter layout ──────────────────────────────────────────────────────
 
-    auto* leftPanel = new QWidget;
-    auto* leftLayout = new QVBoxLayout(leftPanel);
-    leftLayout->addWidget(paramBox);
-    leftLayout->addWidget(roughBox);
-    leftLayout->addWidget(finishBox);
+    // CAD column: gear parameters
+    auto* cadColumn = new QWidget;
+    auto* cadLayout = new QVBoxLayout(cadColumn);
+    cadLayout->setContentsMargins(4, 4, 4, 4);
+    cadLayout->setSpacing(12);
+    cadLayout->addWidget(paramBox);
+    cadLayout->addStretch();
+
+    // CAM column: roughing / finishing parameters
+    auto* camColumn = new QWidget;
+    auto* camLayout = new QVBoxLayout(camColumn);
+    camLayout->setContentsMargins(4, 4, 4, 4);
+    camLayout->setSpacing(12);
+    camLayout->addWidget(roughBox);
+    camLayout->addWidget(finishBox);
 
     auto label = new QLabel("切割齿数");
-    leftLayout->addWidget(label);
-    leftLayout->addWidget(spinCutTeeth_);
-    leftLayout->addWidget(btnCAM_);
-    leftLayout->addWidget(statusLabel_);
-    leftLayout->addStretch();
+    camLayout->addWidget(label);
+    camLayout->addWidget(spinCutTeeth_);
+    camLayout->addWidget(btnCAM_);
+    camLayout->addWidget(statusLabel_);
+    camLayout->addStretch();
+
+    // Left panel holds the CAD and CAM columns side by side.
+    auto* leftPanel = new QWidget;
+    auto* leftLayout = new QHBoxLayout(leftPanel);
+    leftLayout->setContentsMargins(8, 8, 8, 8);
+    leftLayout->setSpacing(16);
+    leftLayout->addWidget(cadColumn);
+    leftLayout->addWidget(camColumn);
 
     auto* splitter = new QSplitter;
-    leftPanel->setMaximumWidth(320);
+    leftPanel->setMaximumWidth(680);
     splitter->addWidget(leftPanel);
     splitter->addWidget(vtkWidget_);
     splitter->setStretchFactor(0, 0);
@@ -188,6 +224,7 @@ RoughParams MainWindow::readRoughParams() const
     c.cutter_diameter = spinRoughCutter_->value();
     c.remain          = spinCamRemain_->value();
     c.teeth_count     = spinCutTeeth_->value();
+    c.tool_number     = spinRoughTool_->value();
     return c;
 }
 
@@ -200,5 +237,6 @@ FinishParams MainWindow::readFinishParams() const
     c.teeth_count     = spinCutTeeth_->value();
     c.h_cutter        = spinFinishH_->value();
     c.Ra              = spinFinishRa_->value();
+    c.tool_number     = spinFinishTool_->value();
     return c;
 }
