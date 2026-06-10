@@ -25,8 +25,8 @@ bool loadFromJson(GearParams& params, const std::string& path)
     if (j.contains("Ka"))    params.Ka    = j["Ka"].get<int>();
     if (j.contains("Kr"))    params.Kr    = j["Kr"].get<int>();
     if (j.contains("Kz"))    params.Kz    = j["Kz"].get<int>();
-    if (j.contains("x"))    params.x    = j["x"].get<int>();
-    if (j.contains("Rg"))    params.Rg    = j["Rg"].get<int>();
+    if (j.contains("x"))     params.x     = j["x"].get<double>();
+    if (j.contains("Rg"))    params.Rg    = j["Rg"].get<double>();
 
     return true;
 }

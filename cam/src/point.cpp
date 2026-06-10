@@ -30,8 +30,8 @@ Point& Point::movePolar(double r, double p) {
 Point& Point::rotate(double p) {
     double r = radius();
     double a = angle();
-    x = r * std::sin(a + p);
-    y = r * std::cos(a + p);
+    x = r * std::cos(a + p);
+    y = r * std::sin(a + p);
     return *this;
 }
 

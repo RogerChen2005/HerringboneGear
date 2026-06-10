@@ -17,7 +17,7 @@ struct GearDerived {
         , rb(r * std::cos(g.alpha * M_PI / 180.0))
         , ra(r + (1 + g.x) * g.m)
         , rd(r - (1.25 - g.x) * g.m)
-        , inv_pc(inv(g.alpha * M_PI / 180.0))
+        , inv_pc(inv(std::tan(g.alpha * M_PI / 180.0)))
         , theta_half(M_PI / (2.0 * g.z))
         , phi0(theta_half + inv_pc)
     {}

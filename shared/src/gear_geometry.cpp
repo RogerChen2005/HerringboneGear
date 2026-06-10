@@ -26,9 +26,7 @@ Profile ComputeProfile(const GearParams& g)
 
     auto inv = [](double t) { return t - atan(t); };
 
-    // inv_pc uses tan(alpha)-alpha form (equivalent to inv(tan(alpha)))
-    double inv_pc     = tan(g.alpha * M_PI / 180.0) - g.alpha * M_PI / 180.0;
-    double phi0       = d.theta_half + inv_pc;
+    double phi0 = d.phi0;
 
     double t_tip  = sqrt((d.ra / d.rb) * (d.ra / d.rb) - 1.0);
     double t_root = (d.rd > d.rb) ? sqrt((d.rd / d.rb) * (d.rd / d.rb) - 1.0) : 0.0;

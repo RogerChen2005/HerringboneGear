@@ -28,7 +28,7 @@ private:
     double depth_;
     double d_cutter_;
     double remain_;
-    double reverse_;
+    bool   reverse_;
     double twist_;
 
     void CutAcross(const Point& p);

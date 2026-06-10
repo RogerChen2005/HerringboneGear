@@ -15,6 +15,10 @@ find_package(VTK REQUIRED COMPONENTS
 
 set(CMAKE_AUTOMOC ON)
 
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+endif()
+
 aux_source_directory(src/ UI_SOURCES)
 
 if(WIN32)
@@ -42,6 +46,11 @@ target_link_libraries(GearUI PRIVATE
     VTK::IOGeometry
 )
 
+if(MSVC)
+    target_compile_options(GearUI PRIVATE /O2 /GL)
+    target_link_options(GearUI PRIVATE /LTCG /OPT:REF /OPT:ICF)
+endif()
+
 if(WIN32)
     target_link_libraries(GearUI PRIVATE
         Qt6::Widgets
@@ -65,4 +74,12 @@ if(WIN32)
             "$ENV{USERPROFILE}/vcpkg/installed/x64-windows/Qt6/plugins/platforms"
             "$<TARGET_FILE_DIR:GearUI>/platforms"
     )
+    qt_generate_deploy_app_script(
+        TARGET GearUI
+        OUTPUT_SCRIPT deploy_script
+        NO_UNSUPPORTED_PLATFORM_ERROR
+    )
+
+    install(SCRIPT ${deploy_script})
+    install(TARGETS GearUI DESTINATION .)
 endif()

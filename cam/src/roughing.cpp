@@ -6,7 +6,7 @@
 #include <string>
 
 RoughingCut::RoughingCut(const GearParams& params)
-    : params_(params), nc_(params), derived_(params), depth_(3), d_cutter_(6.0), remain_(0.5),
+    : nc_(params), params_(params), derived_(params), depth_(3), d_cutter_(6.0), remain_(0.5),
     reverse_(false), twist_(gear::TwistAngle(params, params.F)) {}
 
 RoughingCut::~RoughingCut() = default;

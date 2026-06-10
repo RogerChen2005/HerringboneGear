@@ -4,6 +4,10 @@ project(GearProjects)
 
 set(CMAKE_CXX_STANDARD 17)
 
+if(MSVC)
+    add_compile_options(/utf-8)
+endif()
+
 add_subdirectory(shared)
 add_subdirectory(cad)
 add_subdirectory(cam)

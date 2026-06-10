@@ -40,7 +40,7 @@ private:
     double remain_;
     double Ra_;
 
-    double reverse_;
+    bool   reverse_;
     double twist_;
     double theta_;
     

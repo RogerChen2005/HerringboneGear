@@ -80,7 +80,7 @@ void NCConverter::CutLine(double x, double y, double z, double a, double c)
 }
 
 void NCConverter::ChangeTool(int number) {
-    AddLine("TOOL CALL" + std::to_string(number) + "Z S3000");
+    AddLine("TOOL CALL " + std::to_string(number) + " Z S3000");
 }
 
 // ---------------------------------------------------------------------------
