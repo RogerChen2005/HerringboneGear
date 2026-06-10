@@ -2,23 +2,27 @@
 
 Parametric herringbone (double-helical) gear generator with CAM toolpath output and a Qt/VTK GUI for 3D preview.
 
-![](./assets/interface.png)
+![](./assets/interface.jpg)
 
 ## Project Structure
 
 ```
-gear/
+HerringboneGear/
 ├── CMakeLists.txt              # Top-level build (C++17)
+├── CMakePresets.json           # debug / release / release-install presets (vcpkg)
 ├── README.md
 │
 ├── shared/                     # Static library: Gear::Params
 │   ├── CMakeLists.txt
 │   ├── includes/
-│   │   ├── gear_params.h       # GearParams struct (z, m, alpha, beta, F, Kt, Ka, Kr, Kz)
-│   │   └── gear_geometry.h     # Involute profile computation
+│   │   ├── gear_params.h       # GearParams struct (z, m, alpha, beta, F, Kt, Ka, Kr, Kz, x, Rg)
+│   │   ├── gear_derived.h      # GearDerived — derived radii, involute, hasRootRelief()
+│   │   ├── gear_geometry.h     # Involute profile computation + gear::Validate()
+│   │   └── point.h             # 2-D point (Cartesian / polar), shared by CAD & CAM
 │   └── src/
 │       ├── gear_params.cpp
-│       └── gear_geometry.cpp
+│       ├── gear_geometry.cpp
+│       └── point.cpp
 │
 ├── cad/                        # Static library: Gear::CAD_Core + HerringboneGearCAD executable
 │   ├── CMakeLists.txt
@@ -37,33 +41,35 @@ gear/
 │   ├── main.cpp
 │   ├── includes/
 │   │   ├── nc_converter.h      # HEIDENHAIN NC format writer
-│   │   ├── roughing.h          # RoughingCut — layer-by-layer roughing
-│   │   ├── finishing.h         # FinishingCut — profile-following finish
+│   │   ├── toolpath_pass.h     # ToolpathPass — common base for machining passes
+│   │   ├── roughing.h          # RoughingCut + RoughParams — layer-by-layer roughing
+│   │   ├── finishing.h         # FinishingCut + FinishParams — profile-following finish
 │   │   └── cam_generate.h      # generateRoughing(), generateFinishing()
 │   └── src/
 │       ├── nc_converter.cpp
+│       ├── toolpath_pass.cpp
 │       ├── roughing.cpp
 │       ├── finishing.cpp
 │       └── cam_generate.cpp
 │
-└── ui/                         # Qt5 GUI: GearUI executable
+└── ui/                         # Qt GUI: GearUI executable (Qt6 on Windows, Qt5 on Linux)
     ├── CMakeLists.txt
     ├── includes/
     │   └── mainwindow.h
     └── src/
         ├── main.cpp
         ├── mainwindow.cpp
-        ├── geometry_handlers.cpp   # "Generate Geometry" — CAD preview with smoothing
-        └── cam_handlers.cpp        # "Generate CAM Code" — NC file output
+        ├── geometry_handlers.cpp   # "生成模型" — CAD preview with smoothing
+        └── cam_handlers.cpp        # "生成 CAM 代码" — NC file output
 ```
 
 ## Dependencies
 
 | Library | Version | Purpose |
 |---------|---------|---------|
-| CMake | ≥ 3.12 | Build system |
+| CMake | ≥ 3.12 (presets need 3.25) | Build system |
 | VTK | 9.x | 3D mesh generation, rendering |
-| Qt5 | 5.15+ | GUI framework |
+| Qt | Qt6 (Windows) / Qt5 5.15+ (Linux) | GUI framework |
 | nlohmann_json | any | JSON parameter file parsing |
 
 ### Ubuntu / Debian install
@@ -72,26 +78,55 @@ gear/
 sudo apt install cmake libvtk9-dev libvtk9-qt-dev qtbase5-dev libqt5opengl5-dev nlohmann-json3-dev
 ```
 
+### Windows install (vcpkg)
+
+```powershell
+vcpkg install qtbase vtk[qt] nlohmann-json
+```
+
 ## Build
+
+### Linux
 
 ```bash
 cmake -B build -S .
 cmake --build build -j$(nproc)
 ```
 
+### Windows (presets, run from a VS developer prompt)
+
+```powershell
+cmake --preset release          # configure (uses ~/vcpkg toolchain)
+cmake --build out/build/release
+```
+
 ### Outputs
 
 | Binary | Description |
 |--------|-------------|
-| `build/ui/GearUI` | GUI application |
-| `build/cad/HerringboneGearCAD` | CLI — writes `herringbone_gear.stl` + `gear_stock.stl` |
-| `build/cam/HerringboneGearCAM` | CLI — writes `rough.nc` + `finish.nc` |
+| `<build>/ui/GearUI` | GUI application |
+| `<build>/cad/HerringboneGearCAD` | CLI — writes `herringbone_gear.stl` + `gear_stock.stl` |
+| `<build>/cam/HerringboneGearCAM` | CLI — writes `rough.nc` + `finish.nc` |
+
+## Install / Package (Windows)
+
+The `release-install` preset installs a self-contained GUI package to `dist/`
+(exe + required Qt/VTK/ICU DLLs + `platforms/qwindows.dll`, no debug symbols —
+resolved via CMake `RUNTIME_DEPENDENCIES`, no windeployqt needed):
+
+```powershell
+cmake --preset release-install
+cmake --build out/build/release-install
+cmake --install out/build/release-install   # → dist/GearUI.exe
+```
 
 ## Runtime
 
 ### CLI
 
-Both CLI executables read optional `gear.json` in the working directory to override defaults:
+Both CLI executables read optional `gear.json` in the working directory to override defaults.
+Parameters are validated on startup (ranges and geometric consistency); invalid
+input is rejected with an error message and exit code 1.
 
 ```json
 {
@@ -114,9 +149,10 @@ cd build
 ./build/ui/GearUI
 ```
 
-- **Left panel** — edit gear parameters (teeth, module, helix angle, etc.)
-- **Generate Geometry** — builds the herringbone gear + stock cylinder and displays them in the 3D viewport (smoothed for preview)
-- **Generate CAM Code** — writes HEIDENHAIN-format `rough.nc` and `finish.nc`
+- **Left panel** — edit gear parameters (teeth, module, helix angle, …) and CAM parameters (cut depth, cutter size, stock allowance, …)
+- **生成模型** — validates parameters, builds the herringbone gear + stock cylinder and displays them in the 3D viewport
+- **保存模型** — exports the gear and stock as STL files
+- **生成 CAM 代码** — writes HEIDENHAIN-format roughing and finishing NC files (save dialogs)
 - **3D viewport** — mouse rotate / pan / zoom (trackball interaction)
 
 ### Gear Parameters
@@ -132,3 +168,5 @@ cd build
 | `Ka` | 6 | Sample points per tip arc |
 | `Kr` | 8 | Sample points per root fillet |
 | `Kz` | 28 | Axial slices per half |
+| `x` | 0 | Profile shift coefficient (0–1) |
+| `Rg` | 10 mm | Root connecting-arc radius (used when the root circle lies inside the base circle, i.e. small tooth counts) |
