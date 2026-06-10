@@ -27,7 +27,7 @@ public:
     void WriteToFile(const std::string& filename);
     void ClearAll();
 
-    void operator+=(const NCConverter& nc);
+    NCConverter& operator+=(const NCConverter& nc);
 
 private:
     GearParams params_;

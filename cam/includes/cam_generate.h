@@ -1,15 +1,10 @@
 #pragma once
 
-#include "nc_converter.h"
+#include "roughing.h"
+#include "finishing.h"
 
-// Generate a roughing pass for the given number of teeth.
-// Returns the NCConverter with the toolpath (no header/footer).
-NCConverter generateRoughing(const GearParams& g, int teeth_count,
-                             double layer_depth, double cutter_diameter,
-                             double remain);
+// Generate a complete roughing program (header + toolpath + footer).
+NCConverter generateRoughing(const GearParams& g, const RoughParams& p);
 
-// Generate a finishing pass for all teeth.
-// Returns the NCConverter with the toolpath (no header/footer).
-NCConverter generateFinishing(const GearParams& g, int teeth_count,
-                             double layer_depth, double cutter_diameter,
-                             double remain, double h_cutter, double Ra);
+// Generate a complete finishing program (header + toolpath + footer).
+NCConverter generateFinishing(const GearParams& g, const FinishParams& p);

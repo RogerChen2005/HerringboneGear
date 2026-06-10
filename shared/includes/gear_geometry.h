@@ -1,13 +1,19 @@
 #pragma once
 
 #include "gear_params.h"
+#include "point.h"
 #include <vector>
+#include <string>
 #include <utility>
 
-using Profile = std::vector<std::pair<double, double>>;
+using Profile = std::vector<Point>;
 
 // Involute gear geometry — shared by roughing and finishing.
 namespace gear {
+
+// Check parameters for range and geometric consistency.
+// Returns an empty string if valid, otherwise a human-readable error message.
+std::string Validate(const GearParams& g);
 
 Profile ComputeProfile(const GearParams& g);
 double  TwistAngle(const GearParams& g, double z);

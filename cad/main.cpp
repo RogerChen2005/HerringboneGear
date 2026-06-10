@@ -10,6 +10,7 @@
 //   6. Export binary STL
 
 #include "gear_params.h"
+#include "gear_geometry.h"
 #include "herringbone_gear.h"
 #include "stock.h"
 #include <iostream>
@@ -22,6 +23,12 @@ int main()
         std::cout << "Loaded parameters from gear.json\n";
     else
         std::cout << "Using compiled defaults (no gear.json found)\n";
+
+    std::string err = gear::Validate(g);
+    if (!err.empty()) {
+        std::cerr << "Invalid parameters: " << err << "\n";
+        return 1;
+    }
 
     createHerringboneGear(g);
     createStock(g);

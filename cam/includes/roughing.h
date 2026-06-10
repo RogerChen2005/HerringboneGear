@@ -1,37 +1,24 @@
 #pragma once
 
-#include "nc_converter.h"
-#include "gear_derived.h"
-#include "point.h"
+#include "toolpath_pass.h"
 
-class RoughingCut {
+// Roughing pass configuration.
+struct RoughParams {
+    double layer_depth     = 3.0;  // radial depth per layer (mm)
+    double cutter_diameter = 6.0;  // mm
+    double remain          = 0.5;  // stock left for finishing (mm)
+    int    teeth_count     = 1;    // number of teeth to cut
+};
+
+class RoughingCut : public ToolpathPass {
 public:
-    RoughingCut(const GearParams& params);
-    ~RoughingCut();
-
-    NCConverter& Generate(int teeth_count);
-
-    // Getters
-    double GetDepth() const { return depth_; }
-    double GetRemain() const { return remain_; }
-    double GetCutterDiameter() const { return d_cutter_; }
-
-    // Setters
-    void SetDepth(double depth) { depth_ = depth; }
-    void SetRemain(double remain) { remain_ = remain; }
-    void SetCutterDiameter(double d) { d_cutter_ = d; }
+    RoughingCut(const GearParams& params, const RoughParams& cfg);
 
 private:
-    NCConverter nc_;
-    GearParams params_;
-    GearDerived derived_;
-    double depth_;
-    double d_cutter_;
-    double remain_;
-    bool   reverse_;
-    double twist_;
+    RoughParams cfg_;
 
-    void CutAcross(const Point& p);
-    void RoughTooth(const double base);
-    void RoughLayer(const double radius, const double start, const double end);
+    void CutTooth(double base) override;
+    const char* PassName() const override { return "Roughing"; }
+
+    void RoughLayer(double radius, double start, double end);
 };

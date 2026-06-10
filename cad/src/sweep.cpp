@@ -25,7 +25,7 @@ vtkSmartPointer<vtkPolyData> sweepHalf(
         double cs = cos(twist), sn = sin(twist);
 
         for (int j = 0; j < M; ++j) {
-            double x = profile[j].first, y = profile[j].second;
+            double x = profile[j].x, y = profile[j].y;
             pts->SetPoint(k * M + j, x*cs - y*sn, x*sn + y*cs, z);
         }
     }

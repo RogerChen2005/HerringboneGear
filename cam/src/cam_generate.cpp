@@ -1,35 +1,21 @@
 #include "cam_generate.h"
-#include "roughing.h"
-#include "finishing.h"
 
-NCConverter generateRoughing(const GearParams& g, int teeth_count,
-                             double layer_depth, double cutter_diameter,
-                             double remain)
+NCConverter generateRoughing(const GearParams& g, const RoughParams& p)
 {
     NCConverter nc(g);
-    RoughingCut roughCut(g);
-    roughCut.SetCutterDiameter(cutter_diameter);
-    roughCut.SetDepth(layer_depth);
-    roughCut.SetRemain(remain);
+    RoughingCut roughCut(g, p);
     nc.ProgramHeader(1);
-    nc += roughCut.Generate(teeth_count);
+    nc += roughCut.Generate(p.teeth_count);
     nc.ProgramFooter();
     return nc;
 }
 
-NCConverter generateFinishing(const GearParams& g, int teeth_count,
-                             double layer_depth, double cutter_diameter,
-                             double remain, double h_cutter, double Ra)
+NCConverter generateFinishing(const GearParams& g, const FinishParams& p)
 {
     NCConverter nc(g);
-    FinishingCut finishCut(g);
-    finishCut.SetCutterDiameter(cutter_diameter);
-    finishCut.SetDepth(layer_depth);
-    finishCut.SetRemain(remain);
-    finishCut.SetCutterHeight(h_cutter);
-    finishCut.SetRa(Ra);
+    FinishingCut finishCut(g, p);
     nc.ProgramHeader(60);
-    nc += finishCut.Generate(teeth_count);
+    nc += finishCut.Generate(p.teeth_count);
     nc.ProgramFooter();
     return nc;
 }

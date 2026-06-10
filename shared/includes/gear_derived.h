@@ -23,4 +23,8 @@ struct GearDerived {
     {}
 
     static double inv(double t) { return t - std::atan(t); }
+
+    // True when the root circle lies inside the base circle, so the flank
+    // cannot reach the root and a connecting fillet arc (radius Rg) is needed.
+    bool hasRootRelief() const { return rd < rb; }
 };

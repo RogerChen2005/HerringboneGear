@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gear_params.h"
+#include "cam_generate.h"
 #include <QMainWindow>
 #include <QDoubleSpinBox>
 #include <QSpinBox>
@@ -71,20 +72,10 @@ private:
     void setupUi();
     GearParams readParams() const;
 
-    struct RoughParams {
-        double layer_depth;
-        double cutter_diameter;
-        double remain;
-        int    teeth_count;
-    };
-    struct FinishParams {
-        double layer_depth;
-        double cutter_diameter;
-        double remain;
-        int    teeth_count;
-        double h_cutter;
-        double Ra;
-    };
+    // Returns true when the current gear parameters are valid;
+    // otherwise shows an error dialog and returns false.
+    bool validateParams(const GearParams& g);
+
     RoughParams  readRoughParams() const;
     FinishParams readFinishParams() const;
 };

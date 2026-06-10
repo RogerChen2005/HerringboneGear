@@ -16,10 +16,11 @@
 // ── Generate Geometry (CAD) ──────────────────────────────────────────────────
 void MainWindow::onGenerateGeometry()
 {
+    GearParams g = readParams();
+    if (!validateParams(g)) return;
+
     statusLabel_->setText("Generating geometry...");
     QApplication::processEvents();
-
-    GearParams g = readParams();
 
     gearMesh_  = buildGearMesh(g);
     stockMesh_ = buildStockMesh(g);

@@ -1,55 +1,34 @@
 #pragma once
 
-#include "nc_converter.h"
-#include "gear_geometry.h"
-#include "gear_derived.h"
-#include "point.h"
+#include "toolpath_pass.h"
 
-enum Direction {
-    Left,
-    Right
+// Finishing pass configuration.
+struct FinishParams {
+    double layer_depth     = 0.2;   // radial depth per layer (mm)
+    double cutter_diameter = 4.0;   // mm
+    double remain          = 0.5;   // stock left by roughing (mm)
+    int    teeth_count     = 1;     // number of teeth to cut
+    double h_cutter        = 25.0;  // cutter height (mm)
+    double Ra              = 0.064; // target surface roughness (mm)
 };
 
-class FinishingCut {
+class FinishingCut : public ToolpathPass {
 public:
-    explicit FinishingCut(const GearParams& params);
-    ~FinishingCut();
-
-    NCConverter& Generate(int teeth_count);
-
-    double GetDepth() const { return depth_; }
-    double GetRemain() const { return remain_; }
-    double GetCutterDiameter() const { return d_cutter_; }
-    double GetCutterHeight() const { return h_cutter_; }
-    double GetRa() const { return Ra_; }
-
-    // Setters
-    void SetDepth(double depth) { depth_ = depth; }
-    void SetRemain(double remain) { remain_ = remain; }
-    void SetCutterDiameter(double d) { d_cutter_ = d; }
-    void SetCutterHeight(double h) { h_cutter_ = h; }
-    void SetRa(double Ra) { Ra_ = Ra; }
+    FinishingCut(const GearParams& params, const FinishParams& cfg);
 
 private:
-    NCConverter nc_;
-    GearParams params_;
-    GearDerived derived_;
-    double depth_;
-    double d_cutter_;
-    double h_cutter_;
-    double remain_;
-    double Ra_;
+    enum Direction { Left, Right };
 
-    bool   reverse_;
-    double twist_;
+    FinishParams cfg_;
     double theta_;
-    
-    void FinishLayer(const double base);
-    void FinishRoot(const double base, const double dist);
-    void FinishCorner(const double base, const double dist, const Direction direction);
-    void FinishCurve(const double base, const double dist, const Direction direction);
-    double CalcG(const double Ra, const double R);
 
-    void CutAcross(const Point& p);
-    void MillAcross(const Point& p, const double phi);
+    void CutTooth(double base) override;
+    const char* PassName() const override { return "Finishing"; }
+
+    void FinishRoot(double base, double dist);
+    void FinishCorner(double base, double dist, Direction direction);
+    void FinishCurve(double base, double dist, Direction direction);
+    double CalcG(double Ra, double R) const;
+
+    void MillAcross(const Point& p, double phi);
 };

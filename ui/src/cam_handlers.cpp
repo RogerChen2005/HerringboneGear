@@ -9,6 +9,8 @@
 void MainWindow::onGenerateCAM()
 {
     GearParams g = readParams();
+    if (!validateParams(g)) return;
+
     auto rp = readRoughParams();
     auto fp = readFinishParams();
 
@@ -17,7 +19,7 @@ void MainWindow::onGenerateCAM()
         statusLabel_->setText("Generating roughing toolpath...");
         QApplication::processEvents();
 
-        auto rough = generateRoughing(g, rp.teeth_count, rp.layer_depth, rp.cutter_diameter, rp.remain);
+        auto rough = generateRoughing(g, rp);
 
         QString roughPath = QFileDialog::getSaveFileName(
             this, "Save Roughing NC", "rough.nc", "NC Files (*.nc)");
@@ -29,7 +31,7 @@ void MainWindow::onGenerateCAM()
         statusLabel_->setText("Generating finishing toolpath...");
         QApplication::processEvents();
 
-        auto finish = generateFinishing(g, fp.teeth_count, fp.layer_depth, fp.cutter_diameter, fp.remain, fp.h_cutter, fp.Ra);
+        auto finish = generateFinishing(g, fp);
 
         QString finishPath = QFileDialog::getSaveFileName(
             this, "Save Finishing NC", "finish.nc", "NC Files (*.nc)");
