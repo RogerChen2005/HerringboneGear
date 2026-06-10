@@ -67,19 +67,30 @@ vtk_module_autoinit(
 )
 
 if(WIN32)
+    # Copy the Qt platform plugin next to the exe so it also runs from the
+    # build tree. Uses the imported plugin target instead of a hardcoded
+    # vcpkg path.
     add_custom_command(TARGET GearUI POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:GearUI>/plugins/platforms"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "$ENV{USERPROFILE}/vcpkg/installed/x64-windows/Qt6/plugins/platforms"
             "$<TARGET_FILE_DIR:GearUI>/platforms"
-    )
-    qt_generate_deploy_app_script(
-        TARGET GearUI
-        OUTPUT_SCRIPT deploy_script
-        NO_UNSUPPORTED_PLATFORM_ERROR
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:Qt6::QWindowsIntegrationPlugin>"
+            "$<TARGET_FILE_DIR:GearUI>/platforms/"
     )
 
-    install(SCRIPT ${deploy_script})
-    install(TARGETS GearUI DESTINATION .)
+    # Install the exe plus the closure of DLLs it actually imports
+    # (Qt, VTK, icu, ...). vcpkg has already copied all candidate DLLs
+    # next to the exe, so resolve them from there. System DLLs excluded.
+    install(TARGETS GearUI
+        RUNTIME_DEPENDENCIES
+            PRE_EXCLUDE_REGEXES "api-ms-.*" "ext-ms-.*"
+            POST_EXCLUDE_REGEXES "[Ss]ystem32"
+            DIRECTORIES "$<TARGET_FILE_DIR:GearUI>"
+        RUNTIME DESTINATION .
+    )
+
+    # The platform plugin is loaded at runtime, not linked — install it
+    # explicitly. Qt finds the platforms/ dir next to the exe.
+    install(FILES "$<TARGET_FILE:Qt6::QWindowsIntegrationPlugin>"
+        DESTINATION platforms)
 endif()
