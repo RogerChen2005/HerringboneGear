@@ -14,6 +14,7 @@
 #include <vtkGenericOpenGLRenderWindow.h>
 
 class QVTKOpenGLNativeWidget;
+class QGroupBox;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -21,6 +22,10 @@ class MainWindow : public QMainWindow {
 public:
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override = default;
+
+protected:
+    // Re-apply the theme when the OS switches between light/dark mode.
+    void changeEvent(QEvent* event) override;
 
 private slots:
     void onGenerateGeometry();
@@ -61,6 +66,11 @@ private:
     QPushButton* btnSaveGeometry_;
     QPushButton* btnCAM_;
     QLabel*      statusLabel_;
+    QLabel*      statusIcon_;   // busy / done / error glyph left of the text
+
+    // Status-bar state; setStatus() updates the icon and text together.
+    enum class Status { Idle, Busy, Done, Error };
+    void setStatus(const QString& text, Status state);
 
     // Stored meshes for export
     vtkSmartPointer<vtkPolyData> gearMesh_;
@@ -72,7 +82,16 @@ private:
     vtkSmartPointer<vtkGenericOpenGLRenderWindow> renderWindow_;
 
     void setupUi();
+    QGroupBox* createGeometryPanel();  // gear parameters + generate/save buttons
+    QGroupBox* createRoughPanel();     // roughing parameters (+ shared remain/teeth)
+    QGroupBox* createFinishPanel();    // finishing parameters
+    void       setupViewport();        // VTK widget, renderer, render window
+    void applyTheme();   // light/dark stylesheet based on the system palette
+    bool applyingTheme_ = false;  // guards against re-entrant theme changes
+
     GearParams readParams() const;
+    void readGeometryParams(GearParams& g) const;   // shape: z, m, α, β, F, x, Rg
+    void readPrecisionParams(GearParams& g) const;  // tessellation: Kt, Ka, Kr, Kz
 
     // Returns true when the current gear parameters are valid;
     // otherwise shows an error dialog and returns false.

@@ -1,0 +1,109 @@
+/*
+ * Application stylesheet template.
+ *
+ * The numbered placeholders are filled at runtime by MainWindow::applyTheme()
+ * with the active light/dark color scheme; see theme.cpp for the token-to-color
+ * mapping (the .arg() order). Do NOT write a literal percent-sign followed by a
+ * digit anywhere in this file except as an intentional placeholder -- QString
+ * ::arg() would bind it and shift every later token.
+ */
+
+QWidget {
+    font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif;
+    font-size: 14px;
+    color: %1;
+}
+QGroupBox {
+    background: %2;
+    border: 1px solid %3;
+    border-radius: 10px;
+    margin-top: 14px;
+    padding-top: 6px;
+    font-weight: 600;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 12px;
+    padding: 2px 8px;
+    color: %4;
+}
+QLabel { color: %5; }
+QSpinBox, QDoubleSpinBox {
+    min-height: 22px;
+    padding: 2px 8px;
+    color: %1;
+    background: %6;
+    border: 1px solid %7;
+    border-radius: 7px;
+    selection-background-color: %12;
+    selection-color: #ffffff;
+}
+QSpinBox:hover, QDoubleSpinBox:hover { border-color: %8; }
+QSpinBox:focus, QDoubleSpinBox:focus {
+    border-color: %12;
+    background: %9;
+}
+QSpinBox::up-button, QDoubleSpinBox::up-button,
+QSpinBox::down-button, QDoubleSpinBox::down-button {
+    width: 18px;
+    border: none;
+    background: transparent;
+    subcontrol-origin: border;
+}
+QSpinBox::up-button, QDoubleSpinBox::up-button { subcontrol-position: top right; }
+QSpinBox::down-button, QDoubleSpinBox::down-button { subcontrol-position: bottom right; }
+QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover,
+QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {
+    background: %10;
+    border-radius: 4px;
+}
+/* Theme-colored arrow images; the default glyph blends into the input
+   background and looks missing. */
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
+    image: url(%18);
+    width: 9px; height: 6px;
+}
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
+    image: url(%19);
+    width: 9px; height: 6px;
+}
+QSpinBox::up-arrow:disabled, QSpinBox::up-arrow:off,
+QDoubleSpinBox::up-arrow:disabled, QDoubleSpinBox::up-arrow:off {
+    image: url(%20);
+}
+QSpinBox::down-arrow:disabled, QSpinBox::down-arrow:off,
+QDoubleSpinBox::down-arrow:disabled, QDoubleSpinBox::down-arrow:off {
+    image: url(%21);
+}
+QPushButton {
+    min-height: 22px;
+    padding: 6px 14px;
+    background: %12;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+}
+QPushButton:hover  { background: %13; }
+QPushButton:pressed { background: %14; }
+QPushButton:disabled {
+    background: %15;
+    color: %16;
+}
+QSplitter::handle { background: %17; }
+QSplitter::handle:horizontal { width: 2px; }
+QStatusBar {
+    background: transparent;
+}
+QStatusBar::item { border: none; }
+QStatusBar QLabel#statusIcon {
+    width: 28px;
+    margin: 0px 0px 6px 12px;
+}
+QStatusBar QLabel#statusText {
+    font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif;
+    font-weight: bold;
+    margin: 0px 0px 6px 3px;
+    background: transparent;
+}

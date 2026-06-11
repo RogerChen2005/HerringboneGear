@@ -14,6 +14,7 @@ find_package(VTK REQUIRED COMPONENTS
 )
 
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
 if(MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
@@ -25,11 +26,13 @@ if(WIN32)
     add_executable(GearUI WIN32
         ${UI_SOURCES}
         includes/mainwindow.h
+        resources/resources.qrc
     )
 else()
     add_executable(GearUI
         ${UI_SOURCES}
         includes/mainwindow.h
+        resources/resources.qrc
     )
 endif()
 

@@ -19,7 +19,7 @@ void MainWindow::onGenerateGeometry()
     GearParams g = readParams();
     if (!validateParams(g)) return;
 
-    statusLabel_->setText("Generating geometry...");
+    setStatus("Generating geometry...", Status::Busy);
     QApplication::processEvents();
 
     gearMesh_  = buildGearMesh(g);
@@ -70,7 +70,7 @@ void MainWindow::onGenerateGeometry()
     renderWindow_->Render();
 
     btnSaveGeometry_->setEnabled(true);
-    statusLabel_->setText("Geometry generated.");
+    setStatus("Geometry generated.", Status::Done);
 }
 
 // ── Save Geometry (STL) ─────────────────────────────────────────────────────
@@ -82,7 +82,7 @@ void MainWindow::onSaveGeometry()
         this, "Save STL", "gear.stl", "STL Files (*.stl)");
     if (path.isEmpty()) return;
 
-    statusLabel_->setText("Saving STL...");
+    setStatus("Saving STL...", Status::Busy);
     QApplication::processEvents();
 
     if (gearMesh_) {
@@ -101,5 +101,5 @@ void MainWindow::onSaveGeometry()
         writer->Write();
     }
 
-    statusLabel_->setText("STL saved: " + path);
+    setStatus("STL saved: " + path, Status::Done);
 }

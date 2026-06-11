@@ -16,7 +16,7 @@ void MainWindow::onGenerateCAM()
 
     try {
         // ── Roughing ────────────────────────────────────────────────────────
-        statusLabel_->setText("Generating roughing toolpath...");
+        setStatus("Generating roughing toolpath...", Status::Busy);
         QApplication::processEvents();
 
         auto rough = generateRoughing(g, rp);
@@ -28,7 +28,7 @@ void MainWindow::onGenerateCAM()
         }
 
         // ── Finishing ───────────────────────────────────────────────────────
-        statusLabel_->setText("Generating finishing toolpath...");
+        setStatus("Generating finishing toolpath...", Status::Busy);
         QApplication::processEvents();
 
         auto finish = generateFinishing(g, fp);
@@ -39,10 +39,10 @@ void MainWindow::onGenerateCAM()
             finish.WriteToFile(finishPath.toUtf8().constData());
         }
     } catch (const std::exception& e) {
-        statusLabel_->setText("CAM failed.");
+        setStatus("CAM failed.", Status::Error);
         QMessageBox::critical(this, "CAM Error", e.what());
         return;
     }
 
-    statusLabel_->setText("CAM done.");
+    setStatus("CAM done.", Status::Done);
 }

@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>styles/app.qss</file>
+        <file>icons/arrow_up_light.png</file>
+        <file>icons/arrow_down_light.png</file>
+        <file>icons/arrow_up_dark.png</file>
+        <file>icons/arrow_down_dark.png</file>
+        <file>icons/arrow_up_light_off.png</file>
+        <file>icons/arrow_down_light_off.png</file>
+        <file>icons/arrow_up_dark_off.png</file>
+        <file>icons/arrow_down_dark_off.png</file>
+        <file>icons/status_busy.png</file>
+        <file>icons/status_done.png</file>
+        <file>icons/status_error.png</file>
+    </qresource>
+</RCC>

@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iomanip>
 #include <stdexcept>
+#include <filesystem>
 
 // ---------------------------------------------------------------------------
 // Construction
@@ -130,7 +131,11 @@ void NCConverter::ProgramFooter()
 
 void NCConverter::WriteToFile(const std::string& filename)
 {
-    std::ofstream out(filename);
+    // The UI passes a UTF-8 path. On Windows std::ofstream(const char*) opens
+    // via the ANSI code page, which mangles non-ASCII paths (e.g. Chinese
+    // folder names) and fails to open. u8path reinterprets the bytes as UTF-8
+    // and yields a native (wide) path, matching how VTK writes the STL files.
+    std::ofstream out(std::filesystem::u8path(filename));
     if (!out)
         throw std::runtime_error("Cannot open file: " + filename);
 
