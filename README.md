@@ -2,7 +2,7 @@
 
 Parametric herringbone (double-helical) gear generator with CAM toolpath output and a Qt/VTK GUI for 3D preview.
 
-![](./assets/interface.jpg)
+![](./assets/software_ui.png)
 
 ## Project Structure
 
@@ -56,9 +56,16 @@ HerringboneGear/
     ├── CMakeLists.txt
     ├── includes/
     │   └── mainwindow.h
+    ├── resources/                  # Qt resource bundle (AUTORCC)
+    │   ├── resources.qrc
+    │   ├── styles/
+    │   │   └── app.qss             # stylesheet template; theme.cpp fills color tokens
+    │   └── icons/                  # spinbox arrows (light/dark) + status glyphs
     └── src/
         ├── main.cpp
-        ├── mainwindow.cpp
+        ├── mainwindow.cpp          # setupUi(), status bar, parameter readout
+        ├── setup_panels.cpp        # geometry / roughing / finishing panel builders
+        ├── theme.cpp               # light/dark stylesheet from the system palette
         ├── geometry_handlers.cpp   # "生成模型" — CAD preview with smoothing
         └── cam_handlers.cpp        # "生成 CAM 代码" — NC file output
 ```
@@ -154,6 +161,8 @@ cd build
 - **保存模型** — exports the gear and stock as STL files
 - **生成 CAM 代码** — writes HEIDENHAIN-format roughing and finishing NC files (save dialogs)
 - **3D viewport** — mouse rotate / pan / zoom (trackball interaction)
+- **Status bar** — bottom-of-window readout with a busy / done / error icon; tracks the active operation
+- **Theme** — follows the system light/dark palette automatically
 
 ### Gear Parameters
 
