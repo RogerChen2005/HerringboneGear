@@ -32,4 +32,5 @@ private:
     double CalcG(double Ra, double R) const;
 
     void MillAcross(const Point& p, double phi, const double r_cutter);
+    void MillAcrossFinal(const Point& p, double phi, const double r_cutter);
 };

@@ -71,8 +71,8 @@ void FinishingCut::FinishCurve(const double base, const double dist, const Direc
             double len = arc - dt * derived_.rb;
             Point p = Point::fromPolar(derived_.rb - height, t);
             p.movePolar(len + (dist + cfg_.cutter_diameter / 2) / std::cos(params_.beta), t - M_PI / 2);
-            MillAcross(p, t, cfg_.cutter_diameter / 2);
-            if (i == 0 && reverse_) MillAcross(p, t, cfg_.cutter_diameter / 2);
+            MillAcrossFinal(p, t, cfg_.cutter_diameter / 2);
+            if (i == 0 && reverse_) MillAcrossFinal(p, t, cfg_.cutter_diameter / 2);
         }
     }
 }
@@ -108,6 +108,24 @@ void FinishingCut::MillAcross(const Point& p, const double phi, const double r_c
     double temp = -(r_cutter) * std::tan(beta) * std::cos(beta) / derived_.rd;//需要传入gear参数 
 
     nc_.CutLine(start.y, start.x, params_.F * (reverse_ ? -temp : 2), -90, -gear::RadToDeg(phi - d_phi));
+    nc_.CutLine(mid.y, mid.x, params_.F, -90, -gear::RadToDeg(phi + twist_));
+    nc_.CutLine(start.y, start.x, params_.F * (reverse_ ? 2 : -temp), -90, -gear::RadToDeg(phi - d_phi));
+    reverse_ = !reverse_;
+}
+
+void FinishingCut::MillAcrossFinal(const Point& p, const double phi, const double r_cutter)
+{
+    double beta = gear::DegToRad(params_.beta);
+    double d_phi = gear::TwistAngle(params_, -(r_cutter)*std::tan(beta) * std::cos(beta));
+	double d_phi_final = (r_cutter / std::cos(beta) - r_cutter) / derived_.rd;
+    Point mid = p.rotated(twist_);
+    Point mid2 = p.rotated(twist_ + d_phi_final);
+    Point start = p.rotated(-d_phi);//刀具回去 
+    double temp = -r_cutter * std::tan(beta) * std::cos(beta) / derived_.rd;//需要传入gear参数 
+
+    nc_.CutLine(start.y, start.x, params_.F * (reverse_ ? -temp : 2), -90, -gear::RadToDeg(phi - d_phi));
+    nc_.CutLine(mid.y, mid.x, params_.F, -90, -gear::RadToDeg(phi + twist_));
+    nc_.CutLine(mid2.y, mid2.x, params_.F, -90, -gear::RadToDeg(phi + twist_ + d_phi_final));
     nc_.CutLine(mid.y, mid.x, params_.F, -90, -gear::RadToDeg(phi + twist_));
     nc_.CutLine(start.y, start.x, params_.F * (reverse_ ? 2 : -temp), -90, -gear::RadToDeg(phi - d_phi));
     reverse_ = !reverse_;
