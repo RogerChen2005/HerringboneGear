@@ -25,7 +25,8 @@ protected:
 
     // One full cut across the face width: entry → V-apex → exit.
     // Alternates direction on every call.
-    void CutAcross(const Point& p);
+    void CutAcross(const Point& p, const double r_cutter);
+    void CutAcrossFinal(const Point& p, const double r_cutter);
 
 private:
     // Per-tooth toolpath, implemented by each pass.

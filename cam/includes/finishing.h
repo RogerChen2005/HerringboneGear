@@ -31,5 +31,5 @@ private:
     void FinishCurve(double base, double dist, Direction direction);
     double CalcG(double Ra, double R) const;
 
-    void MillAcross(const Point& p, double phi);
+    void MillAcross(const Point& p, double phi, const double r_cutter);
 };

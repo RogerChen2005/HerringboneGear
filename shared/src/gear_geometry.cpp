@@ -152,4 +152,9 @@ double RadToDeg(double rad)
     return rad * 180.0 / M_PI;
 }
 
+double DegToRad(double deg)
+{
+    return deg * M_PI / 180.0;
+}
+
 } // namespace gear

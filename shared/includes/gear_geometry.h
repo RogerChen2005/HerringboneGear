@@ -20,6 +20,7 @@ double  TwistAngle(const GearParams& g, double z);
 double  HelixAngleDeg(const GearParams& g, double z);
 std::pair<double, double> RotatePoint(double x, double y, double angle_rad);
 double  RadToDeg(double rad);
+double  DegToRad(double deg);
 double calc_theta(const double _rb, const double _rd, const double _rg);
 double calc_radius(const double _theta, const double _rd, const double _rg);
 
