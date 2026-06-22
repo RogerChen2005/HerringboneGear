@@ -4,6 +4,7 @@
 #include <cmath>
 
 struct GearDerived {
+    double mt;
     double r;           // pitch radius
     double rb;          // base circle radius
     double ra;          // addendum (tip) radius
@@ -13,10 +14,11 @@ struct GearDerived {
     double phi0;        // initial angular offset = theta_half + inv_pc
 
     explicit GearDerived(const GearParams& g)
-        : r(g.m * g.z / 2.0)
+        : mt(g.m / std::cos(g.beta * M_PI / 180.0))
+        , r(mt * g.z / 2.0)
         , rb(r * std::cos(g.alpha * M_PI / 180.0))
-        , ra(r + (1 + g.x) * g.m)
-        , rd(r - (1.25 - g.x) * g.m)
+        , ra(r + (1 + g.x) * mt)
+        , rd(r - (1.25 - g.x) * mt)
         , inv_pc(inv(std::tan(g.alpha * M_PI / 180.0)))
         , theta_half(M_PI / (2.0 * g.z))
         , phi0(theta_half + inv_pc)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gear_geometry.h"
+#include "gear_derived.h"
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 
@@ -11,4 +12,4 @@
 //
 // Both halves use the SAME twist magnitude, producing the V-shape.
 vtkSmartPointer<vtkPolyData> sweepHalf(
-    const Profile& profile, const GearParams& g, double z_sign);
+    const Profile& profile, const GearParams& g, const GearDerived& d, double z_sign);

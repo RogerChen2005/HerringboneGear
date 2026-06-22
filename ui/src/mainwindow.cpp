@@ -123,7 +123,7 @@ void MainWindow::readGeometryParams(GearParams& g) const
     g.beta  = spinBeta_->value();
     g.F     = spinFaceWidth_->value();
     g.x     = spinX_->value();
-    g.Rg    = spinRg_->value();
+    g.Rg    = spinRg_->value() / std::cos(g.beta);
 }
 
 // Tessellation: how finely each feature is sampled when meshing.

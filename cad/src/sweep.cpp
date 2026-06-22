@@ -6,10 +6,10 @@
 #include <cmath>
 
 vtkSmartPointer<vtkPolyData> sweepHalf(
-    const Profile& profile, const GearParams& g, double z_sign)
+    const Profile& profile, const GearParams& g, const GearDerived& d, double z_sign)
 {
-    const double PI = vtkMath::Pi();
-    double r    = g.m * g.z / 2.0;
+    constexpr double PI = vtkMath::Pi();
+    double r    = d.r;
     double beta = g.beta * PI / 180.0;
     int M = static_cast<int>(profile.size());
     int K = g.Kz;

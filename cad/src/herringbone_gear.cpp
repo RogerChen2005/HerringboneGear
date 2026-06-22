@@ -12,10 +12,11 @@
 
 vtkSmartPointer<vtkPolyData> buildGearMesh(const GearParams& g)
 {
+    GearDerived d(g);
     Profile profile = gear::ComputeProfile(g);
 
-    auto half1 = sweepHalf(profile, g, +1.0);
-    auto half2 = sweepHalf(profile, g, -1.0);
+    auto half1 = sweepHalf(profile, g, d, +1.0);
+    auto half2 = sweepHalf(profile, g, d, -1.0);
 
     vtkNew<vtkAppendPolyData> append;
     append->AddInputData(half1);
@@ -28,10 +29,9 @@ vtkSmartPointer<vtkPolyData> buildGearMesh(const GearParams& g)
     clean->SetInputConnection(tri->GetOutputPort());
     clean->SetTolerance(1e-5);
 
-    double ra = g.m * g.z / 2.0 + g.m;
     vtkNew<vtkFillHolesFilter> fill;
     fill->SetInputConnection(clean->GetOutputPort());
-    fill->SetHoleSize(ra * ra * vtkMath::Pi() * 1.5);
+    fill->SetHoleSize(d.ra * d.ra * vtkMath::Pi() * 1.5);
 
     vtkNew<vtkPolyDataNormals> normals;
     normals->SetInputConnection(fill->GetOutputPort());
