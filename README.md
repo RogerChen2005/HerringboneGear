@@ -70,6 +70,10 @@ HerringboneGear/
         └── cam_handlers.cpp        # "生成 CAM 代码" — NC file output
 ```
 
+`webui/` 提供独立的浏览器版本：原生 Web UI + WebGL 预览，并将共享的
+C++ 几何/CAM 算法编译为 WebAssembly。构建和运行方式见
+[`webui/README.md`](webui/README.md)。桌面版与 Web 版可独立构建。
+
 ## Dependencies
 
 | Library | Version | Purpose |

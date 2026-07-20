@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f3ed">
+  <title>Herringbone / Web CAD·CAM</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='26' fill='%2310191d' stroke='%23d9a441' stroke-width='5'/%3E%3Ccircle cx='32' cy='32' r='9' fill='%23d9a441'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="masthead">
+    <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+    <h1>HERRINGBONE <em>GEAR</em></h1>
+  </header>
+
+  <main class="workbench">
+    <aside class="controls" aria-label="参数面板">
+      <nav class="tabs" aria-label="参数类别">
+        <button class="tab active" data-tab="geometry">几何</button>
+        <button class="tab" data-tab="precision">精度</button>
+        <button class="tab" data-tab="cam">CAM</button>
+      </nav>
+
+      <form id="parameters" autocomplete="off">
+        <section class="panel active" data-panel="geometry">
+          <div class="section-title"><b>01</b><span>齿轮几何</span></div>
+          <div class="field-grid">
+            <label><span>齿数 <small>z</small></span><input id="z" type="number" min="4" max="200" step="1" value="36"></label>
+            <label><span>模数 <small>m / mm</small></span><input id="m" type="number" min="0.1" max="200" step="0.1" value="15"></label>
+            <label><span>压力角 <small>α / °</small></span><input id="alpha" type="number" min="1" max="44" step="0.1" value="20"></label>
+            <label><span>螺旋角 <small>β / °</small></span><input id="beta" type="number" min="0" max="59" step="0.1" value="25"></label>
+            <label><span>半齿宽 <small>F / mm</small></span><input id="face" type="number" min="1" max="1000" step="0.1" value="100"></label>
+            <label><span>变位系数 <small>x</small></span><input id="x" type="number" min="0" max="1" step="0.01" value="0"></label>
+            <label class="wide"><span>连接圆弧半径 <small>Rg / mm</small></span><input id="rg" type="number" min="0.1" max="100" step="0.1" value="10"></label>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="precision">
+          <div class="section-title"><b>02</b><span>离散精度</span></div>
+          <p class="hint">数值越高曲面越平滑，同时增加生成时间和模型大小。</p>
+          <div class="field-grid">
+            <label><span>齿面采样 <small>Kt</small></span><input id="kt" type="number" min="2" max="200" step="1" value="16"></label>
+            <label><span>齿顶采样 <small>Ka</small></span><input id="ka" type="number" min="1" max="200" step="1" value="6"></label>
+            <label><span>齿根采样 <small>Kr</small></span><input id="kr" type="number" min="1" max="200" step="1" value="8"></label>
+            <label><span>轴向分层 <small>Kz / half</small></span><input id="kz" type="number" min="1" max="500" step="1" value="28"></label>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="cam">
+          <div class="section-title"><b>03</b><span>粗加工</span></div>
+          <div class="field-grid compact">
+            <label><span>刀具号</span><input id="roughTool" type="number" min="1" max="999" value="1"></label>
+            <label><span>层深 / mm</span><input id="roughDepth" type="number" min="0.01" step="0.01" value="3"></label>
+            <label><span>刀具直径 / mm</span><input id="roughCutter" type="number" min="0.1" step="0.1" value="6"></label>
+            <label><span>余量 / mm</span><input id="remain" type="number" min="0" step="0.1" value="0.5"></label>
+          </div>
+          <div class="section-title secondary"><b>04</b><span>精加工</span></div>
+          <div class="field-grid compact">
+            <label><span>刀具号</span><input id="finishTool" type="number" min="1" max="999" value="60"></label>
+            <label><span>层深 / mm</span><input id="finishDepth" type="number" min="0.01" step="0.01" value="0.2"></label>
+            <label><span>刀具直径 / mm</span><input id="finishCutter" type="number" min="0.1" step="0.1" value="4"></label>
+            <label><span>刀具高度 / mm</span><input id="cutterHeight" type="number" min="0.1" step="0.1" value="25"></label>
+            <label><span>Ra / mm</span><input id="ra" type="number" min="0.001" step="0.001" value="0.064"></label>
+            <label><span>加工齿数</span><input id="teethCount" type="number" min="1" max="200" value="1"></label>
+          </div>
+        </section>
+      </form>
+
+      <div class="primary-actions">
+        <button class="button primary" id="generate" type="button"><span>生成模型</span><kbd>G</kbd></button>
+        <button class="button ghost" id="saveStl" type="button" disabled>导出 STL</button>
+        <button class="button dark" id="generateCam" type="button">生成 CAM</button>
+      </div>
+    </aside>
+
+    <section class="viewport" aria-label="三维模型预览">
+      <canvas id="canvas"></canvas>
+      <div class="blueprint-grid" aria-hidden="true"></div>
+      <div class="view-topline"><span>3D VIEW / SHADED</span><span id="fps">—</span></div>
+      <div class="view-tools" aria-label="视图工具">
+        <button id="fit" title="适应窗口">FIT</button>
+        <button id="wireframe" title="切换线框">WIRE</button>
+      </div>
+      <div class="axis" aria-hidden="true"><i class="x">X</i><i class="y">Y</i><i class="z">Z</i></div>
+      <div class="empty-state" id="emptyState">
+        <span class="gear-outline" aria-hidden="true">✣</span>
+        <strong>等待几何参数</strong>
+        <small>生成过程完全在本机浏览器内完成</small>
+      </div>
+      <footer class="status-strip">
+        <div><span>顶点</span><b id="vertexStat">—</b></div>
+        <div><span>三角面</span><b id="faceStat">—</b></div>
+        <div><span>生成耗时</span><b id="timeStat">—</b></div>
+        <p id="message" role="status">计算核心尚未就绪</p>
+      </footer>
+    </section>
+  </main>
+
+  <script src="dist/gear-wasm.js"></script>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

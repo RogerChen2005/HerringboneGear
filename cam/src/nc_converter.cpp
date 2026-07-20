@@ -143,6 +143,14 @@ void NCConverter::WriteToFile(const std::string& filename)
         out << line << "\n";
 }
 
+std::string NCConverter::ToString() const
+{
+    std::ostringstream out;
+    for (const auto& line : lines_)
+        out << line << '\n';
+    return out.str();
+}
+
 void NCConverter::ClearAll() {
     this->lines_.clear();
 }

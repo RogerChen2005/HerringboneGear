@@ -25,6 +25,7 @@ public:
 
     // --- Output ---
     void WriteToFile(const std::string& filename);
+    std::string ToString() const;
     void ClearAll();
 
     NCConverter& operator+=(const NCConverter& nc);

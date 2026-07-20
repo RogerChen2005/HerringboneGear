@@ -2,7 +2,6 @@
 #include "gear_derived.h"
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 
 namespace gear {
 
@@ -18,7 +17,6 @@ std::string Validate(const GearParams& g)
     if (g.x < 0 || g.x > 1)             return "变位系数 x 须在 [0, 1] 之间";
 
     GearDerived d(g);
-	std::cout << d.mt << " " << d.r << " " << d.rb << " " << d.ra << " " << d.rd << std::endl;
     if (d.rd <= 0)      return "齿根圆半径 <= 0，参数组合无效";
     if (d.ra <= d.rb)   return "齿顶圆半径不大于基圆半径，参数组合无效";
 
