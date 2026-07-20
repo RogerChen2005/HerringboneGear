@@ -1,0 +1,57 @@
+name: Deploy Web UI to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Emscripten
+        uses: emscripten-core/setup-emsdk@v16
+        with:
+          version: 6.0.3
+          actions-cache-folder: emsdk-cache
+
+      - name: Configure WebAssembly build
+        run: emcmake cmake -S . -B out/build/web -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build WebAssembly module
+        run: cmake --build out/build/web --target gear_web --parallel
+
+      - name: Verify site files
+        run: |
+          test -s webui/index.html
+          test -s webui/dist/gear-wasm.js
+          test -s webui/dist/gear-wasm.wasm
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: webui
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

@@ -44,3 +44,14 @@ python -m http.server 8080 -d webui
 生成和导出均在浏览器本地完成，不上传参数或模型。部署时只需把
 `webui/` 作为静态目录发布，并确保服务器以 `application/wasm` MIME 类型返回
 `.wasm` 文件。
+
+## GitHub Pages
+
+推送到 `main` 后，`.github/workflows/deploy-pages.yml` 会在 GitHub Actions
+中使用 Emscripten 6.0.3 重新构建 WASM，并将本目录部署到 GitHub Pages。
+工作流也支持在 Actions 页面手动运行。
+
+首次使用时，请在仓库 **Settings → Pages → Build and deployment → Source**
+中选择 **GitHub Actions**。站点地址为：
+
+<https://rogerchen2005.github.io/HerringboneGear/>
