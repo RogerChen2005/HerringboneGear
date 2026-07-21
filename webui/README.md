@@ -54,4 +54,4 @@ python -m http.server 8080 -d webui
 首次使用时，请在仓库 **Settings → Pages → Build and deployment → Source**
 中选择 **GitHub Actions**。站点地址为：
 
-<https://rogerchen2005.github.io/HerringboneGear/>
+<https://site.cast1e.top/HerringboneGear/>
